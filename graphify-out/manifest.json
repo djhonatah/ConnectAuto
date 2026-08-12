@@ -1,0 +1,32 @@
+{
+  "mvnw": {
+    "mtime": 1786540048.463345,
+    "ast_hash": "ab50dd89da7da2346b28003352eeeeeb",
+    "semantic_hash": "ab50dd89da7da2346b28003352eeeeeb"
+  },
+  "pom.xml": {
+    "mtime": 1786540048.399269,
+    "ast_hash": "d66ca354ef698d2665ae58b19e53375d",
+    "semantic_hash": "d66ca354ef698d2665ae58b19e53375d"
+  },
+  "src/main/java/com/acc/connectauto/ConnectautoApplication.java": {
+    "mtime": 1786540048.6358678,
+    "ast_hash": "2335502bdbdea853ff7428fb457c11ca",
+    "semantic_hash": "2335502bdbdea853ff7428fb457c11ca"
+  },
+  "src/test/java/com/acc/connectauto/ConnectautoApplicationTests.java": {
+    "mtime": 1786540048.5518622,
+    "ast_hash": "1a32a28d8f356826271e0c56760e8d4e",
+    "semantic_hash": "1a32a28d8f356826271e0c56760e8d4e"
+  },
+  ".claude/CLAUDE.md": {
+    "mtime": 1786548912.6382103,
+    "ast_hash": "c232166e6492ba1ed955030b16979b05",
+    "semantic_hash": "c232166e6492ba1ed955030b16979b05"
+  },
+  "CLAUDE.md": {
+    "mtime": 1786548912.6512375,
+    "ast_hash": "8a6643a420fdad6bfb583523bc6cef16",
+    "semantic_hash": "8a6643a420fdad6bfb583523bc6cef16"
+  }
+}
