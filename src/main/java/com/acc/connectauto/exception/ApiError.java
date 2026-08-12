@@ -3,9 +3,6 @@ package com.acc.connectauto.exception;
 import java.time.Instant;
 import java.util.List;
 
-/**
- * Standard error payload returned by the API for any handled exception.
- */
 public record ApiError(
         Instant timestamp,
         int status,

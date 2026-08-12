@@ -9,10 +9,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-/**
- * Centralized exception handling, translating domain/validation exceptions into a
- * consistent {@link ApiError} response body.
- */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -21,8 +17,7 @@ public class GlobalExceptionHandler {
         ApiError body = new ApiError(
                 HttpStatus.NOT_FOUND.value(),
                 HttpStatus.NOT_FOUND.getReasonPhrase(),
-                ex.getMessage()
-        );
+                ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
@@ -36,8 +31,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 "Validation failed",
-                details
-        );
+                details);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
