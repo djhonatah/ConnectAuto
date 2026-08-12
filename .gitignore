@@ -1,8 +1,10 @@
 HELP.md
+
+### Maven ###
 target/
-.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###
 .apt_generated
@@ -31,3 +33,32 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Java ###
+*.class
+*.jar
+*.war
+*.ear
+*.log
+hs_err_pid*
+replay_pid*
+
+### Environment / secrets ###
+.env
+.env.*
+!.env.example
+application-local.properties
+application-local.yml
+
+### OS ###
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+### Claude Code ###
+.claude/settings.local.json
+
+### graphify (generated knowledge graph cache) ###
+graphify-out/cache/
+graphify-out/.graphify_ast.json
+graphify-out/.graphify_detect.json
