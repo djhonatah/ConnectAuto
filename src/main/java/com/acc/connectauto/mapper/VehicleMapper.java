@@ -9,9 +9,9 @@ import com.acc.connectauto.entity.Vehicle;
 
 @Mapper(componentModel = "spring")
 public interface VehicleMapper {
-
     @Mapping(target = "id", ignore = true)
-    Vehicle toEntity(VehicleRequestDTO request);
 
-    VehicleResponseDTO toResponse(Vehicle vehicle);
+    Vehicle toEntity(VehicleRequestDTO vehicleRequestDTO);
+
+    VehicleResponseDTO toDTO(Vehicle vehicle);
 }

@@ -30,8 +30,6 @@ public class Vehicle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // --- Campos obrigatórios ---
-
     @Column(nullable = false)
     private String marca;
 
@@ -44,8 +42,6 @@ public class Vehicle {
 
     @Column(nullable = false)
     private String cor;
-
-    // --- Campos opcionais ---
 
     private Integer ano;
 

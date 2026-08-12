@@ -6,10 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 
-/**
- * Basic SpringDoc/OpenAPI metadata, exposed at {@code /swagger-ui.html} and
- * {@code /v3/api-docs}.
- */
 @Configuration
 public class OpenApiConfig {
 
