@@ -9,15 +9,11 @@ import jakarta.validation.constraints.Size;
 
 public record DealerRequestDTO(
 
-        @NotBlank(message = "razaoSocial é obrigatória")
-        String razaoSocial,
+                @NotBlank(message = "razaoSocial é obrigatória") String razaoSocial,
 
-        @NotBlank(message = "cnpj é obrigatório")
-        @Size(min = 14, max = 14, message = "cnpj deve ter 14 dígitos")
-        String cnpj,
+                @NotBlank(message = "cnpj é obrigatório") @Size(min = 14, max = 14, message = "cnpj deve ter 14 dígitos") String cnpj,
 
-        @NotNull(message = "endereco é obrigatório")
-        @Valid
-        EnderecoDTO endereco
-) {
+                @NotNull(message = "endereco é obrigatório")
+
+                @Valid EnderecoDTO endereco) {
 }

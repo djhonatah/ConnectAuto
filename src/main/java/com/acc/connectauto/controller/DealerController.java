@@ -21,10 +21,12 @@ import com.acc.connectauto.service.DealerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-/**
- * Endpoints REST de concessionárias. Expõe apenas {@link DealerService} e DTOs.
- */
 @RestController
+// Rota no singular ("/dealer") conforme especificado na issue #12 —
+// inconsistente com o
+// plural usado em VehicleController ("/vehicles"). Mantido assim de propósito;
+// avaliar
+// padronização para "/dealers" se a API crescer.
 @RequestMapping("/dealer")
 @RequiredArgsConstructor
 public class DealerController {

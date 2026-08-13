@@ -28,6 +28,7 @@ public class DealerService {
         return dealerMapper.toDTO(savedDealer);
     }
 
+    // readOnly = true: dispensa o dirty-checking do Hibernate nesta transação de leitura.
     @Transactional(readOnly = true)
     public List<DealerResponseDTO> listarTodos() {
         return dealerRepository.findAll().stream()
