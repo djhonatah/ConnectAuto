@@ -2,16 +2,22 @@ package com.acc.connectauto.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.acc.connectauto.client.ViaCepClient;
 import com.acc.connectauto.dto.EnderecoDTO;
+import com.acc.connectauto.dto.ViaCepResponseDTO;
 import com.acc.connectauto.dto.request.DealerRequestDTO;
 import com.acc.connectauto.dto.request.VehicleDealerRequestDTO;
 import com.acc.connectauto.dto.request.VehicleRequestDTO;
@@ -22,6 +28,8 @@ import com.acc.connectauto.exception.ResourceNotFoundException;
 
 /**
  * Testes de integração de {@link VehicleService}, com contexto Spring e H2 reais.
+ * {@link ViaCepClient} é substituído por um dublê (@MockitoBean) — os testes de Vehicle
+ * criam Dealers só como apoio, e não devem depender de uma chamada HTTP real ao ViaCEP.
  */
 @SpringBootTest
 @Transactional
@@ -32,6 +40,15 @@ class VehicleServiceTest {
 
     @Autowired
     private DealerService dealerService;
+
+    @MockitoBean
+    private ViaCepClient viaCepClient;
+
+    @BeforeEach
+    void configurarViaCepClient() {
+        when(viaCepClient.buscarEnderecoPorCep(anyString())).thenReturn(
+                new ViaCepResponseDTO("01310-100", "Av. Principal", "Centro", "São Paulo", "SP", null));
+    }
 
     private VehicleRequestDTO vehicleRequestDTOValido() {
         return new VehicleRequestDTO(

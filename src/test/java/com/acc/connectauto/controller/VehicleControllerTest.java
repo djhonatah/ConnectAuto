@@ -1,6 +1,8 @@
 package com.acc.connectauto.controller;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -13,14 +15,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.math.BigDecimal;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.acc.connectauto.client.ViaCepClient;
 import com.acc.connectauto.dto.EnderecoDTO;
+import com.acc.connectauto.dto.ViaCepResponseDTO;
 import com.acc.connectauto.dto.request.DealerRequestDTO;
 import com.acc.connectauto.dto.request.VehicleDealerRequestDTO;
 import com.acc.connectauto.dto.request.VehicleRequestDTO;
@@ -34,6 +40,8 @@ import tools.jackson.databind.ObjectMapper;
 
 /**
  * Testes de integração dos endpoints HTTP de {@link VehicleController}, via MockMvc.
+ * {@link ViaCepClient} é substituído por um dublê (@MockitoBean) — os testes de Vehicle
+ * criam Dealers só como apoio, e não devem depender de uma chamada HTTP real ao ViaCEP.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -51,6 +59,15 @@ class VehicleControllerTest {
 
     @Autowired
     private DealerService dealerService;
+
+    @MockitoBean
+    private ViaCepClient viaCepClient;
+
+    @BeforeEach
+    void configurarViaCepClient() {
+        when(viaCepClient.buscarEnderecoPorCep(anyString())).thenReturn(
+                new ViaCepResponseDTO("01310-100", "Av. Principal", "Centro", "São Paulo", "SP", null));
+    }
 
     private VehicleRequestDTO vehicleRequestDTOValido() {
         return new VehicleRequestDTO(

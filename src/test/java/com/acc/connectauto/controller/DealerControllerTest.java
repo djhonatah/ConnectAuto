@@ -1,6 +1,8 @@
 package com.acc.connectauto.controller;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -10,16 +12,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
+import com.acc.connectauto.client.ViaCepClient;
 import com.acc.connectauto.dto.EnderecoDTO;
+import com.acc.connectauto.dto.ViaCepResponseDTO;
 import com.acc.connectauto.dto.request.DealerRequestDTO;
 import com.acc.connectauto.dto.request.VehicleRequestDTO;
 import com.acc.connectauto.dto.response.DealerResponseDTO;
@@ -31,6 +37,8 @@ import tools.jackson.databind.ObjectMapper;
 
 /**
  * Testes de integração dos endpoints HTTP de {@link DealerController}, via MockMvc.
+ * {@link ViaCepClient} é substituído por um dublê (@MockitoBean) para não depender de
+ * uma chamada HTTP real ao ViaCEP.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -42,6 +50,15 @@ class DealerControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockitoBean
+    private ViaCepClient viaCepClient;
+
+    @BeforeEach
+    void configurarViaCepClient() {
+        when(viaCepClient.buscarEnderecoPorCep(anyString())).thenReturn(
+                new ViaCepResponseDTO("01310-100", "Av. Principal", "Centro", "São Paulo", "SP", null));
+    }
 
     @Autowired
     private DealerService dealerService;

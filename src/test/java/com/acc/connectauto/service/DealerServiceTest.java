@@ -2,21 +2,30 @@ package com.acc.connectauto.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.acc.connectauto.client.ViaCepClient;
 import com.acc.connectauto.dto.EnderecoDTO;
+import com.acc.connectauto.dto.ViaCepResponseDTO;
 import com.acc.connectauto.dto.request.DealerRequestDTO;
 import com.acc.connectauto.dto.response.DealerResponseDTO;
 import com.acc.connectauto.exception.ResourceNotFoundException;
 
 /**
  * Testes de integração de {@link DealerService}, com contexto Spring e H2 reais.
+ * {@link ViaCepClient} é substituído por um dublê (@MockitoBean): os testes de CRUD não
+ * devem depender de uma chamada HTTP real ao ViaCEP para passar.
  */
 @SpringBootTest
 @Transactional
@@ -24,6 +33,15 @@ class DealerServiceTest {
 
     @Autowired
     private DealerService dealerService;
+
+    @MockitoBean
+    private ViaCepClient viaCepClient;
+
+    @BeforeEach
+    void configurarViaCepClient() {
+        when(viaCepClient.buscarEnderecoPorCep(anyString())).thenReturn(
+                new ViaCepResponseDTO("01310-100", "Av. Principal", "Centro", "São Paulo", "SP", null));
+    }
 
     private DealerRequestDTO dealerRequestDTOValido() {
         return new DealerRequestDTO(
@@ -107,5 +125,25 @@ class DealerServiceTest {
     void deveLancarExcecaoAoExcluirIdInexistente() {
         assertThatThrownBy(() -> dealerService.excluir(999L))
                 .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    void deveConsultarViaCepAoCriarDealer() {
+        dealerService.criar(dealerRequestDTOValido());
+
+        verify(viaCepClient).buscarEnderecoPorCep("01310100");
+    }
+
+    @Test
+    void deveConsultarViaCepAoAtualizarDealer() {
+        DealerResponseDTO dealerResponseDTO = dealerService.criar(dealerRequestDTOValido());
+        DealerRequestDTO dealerAtualizacaoRequestDTO = new DealerRequestDTO(
+                "Auto Center Toyota S.A.",
+                "12345678000199",
+                new EnderecoDTO("Av. Nova, 500", "Jardins", "Campinas", "SP", "13010000"));
+
+        dealerService.atualizar(dealerResponseDTO.id(), dealerAtualizacaoRequestDTO);
+
+        verify(viaCepClient).buscarEnderecoPorCep("13010000");
     }
 }
