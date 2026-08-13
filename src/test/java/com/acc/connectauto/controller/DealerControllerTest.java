@@ -54,10 +54,18 @@ class DealerControllerTest {
     @MockitoBean
     private ViaCepClient viaCepClient;
 
+    // Resposta varia por CEP para que os testes que criam dealers em cidades diferentes
+    // continuem representativos agora que o endereço é sobrescrito pelo retorno do ViaCEP.
     @BeforeEach
     void configurarViaCepClient() {
-        when(viaCepClient.buscarEnderecoPorCep(anyString())).thenReturn(
-                new ViaCepResponseDTO("01310-100", "Av. Principal", "Centro", "São Paulo", "SP", null));
+        when(viaCepClient.buscarEnderecoPorCep(anyString())).thenAnswer(invocation -> {
+            String cep = invocation.getArgument(0);
+            return switch (cep) {
+                case "80420100" -> new ViaCepResponseDTO("80420-100", "Rua das Flores", "Batel", "Curitiba", "PR", null);
+                case "13010000" -> new ViaCepResponseDTO("13010-000", "Av. Nova", "Jardins", "Campinas", "SP", null);
+                default -> new ViaCepResponseDTO("01310-100", "Av. Principal", "Centro", "São Paulo", "SP", null);
+            };
+        });
     }
 
     @Autowired
@@ -190,5 +198,22 @@ class DealerControllerTest {
     void getVehiclesEmDealerIdInexistenteDeveRetornar404() throws Exception {
         mockMvc.perform(get("/dealer/{dealerId}/vehicles", 999L))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void postComCepInexistenteDeveRetornar400() throws Exception {
+        when(viaCepClient.buscarEnderecoPorCep("00000000"))
+                .thenReturn(new ViaCepResponseDTO(null, null, null, null, null, true));
+
+        DealerRequestDTO dealerComCepInexistenteRequestDTO = new DealerRequestDTO(
+                "Auto Center Toyota Ltda",
+                "12345678000199",
+                new EnderecoDTO("Av. Principal, 100", "Centro", "São Paulo", "SP", "00000000"));
+
+        mockMvc.perform(post("/dealer")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(dealerComCepInexistenteRequestDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("CEP 00000000 não encontrado"));
     }
 }

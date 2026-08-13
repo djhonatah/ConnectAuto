@@ -4,12 +4,15 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
 
 import com.acc.connectauto.client.ViaCepClient;
+import com.acc.connectauto.dto.EnderecoDTO;
 import com.acc.connectauto.dto.ViaCepResponseDTO;
 import com.acc.connectauto.dto.request.DealerRequestDTO;
 import com.acc.connectauto.dto.response.DealerResponseDTO;
 import com.acc.connectauto.entity.Dealer;
+import com.acc.connectauto.exception.CepInvalidoException;
 import com.acc.connectauto.exception.ResourceNotFoundException;
 import com.acc.connectauto.mapper.DealerMapper;
 import com.acc.connectauto.repository.DealerRepository;
@@ -28,8 +31,8 @@ public class DealerService {
 
     @Transactional
     public DealerResponseDTO criar(DealerRequestDTO dealerRequestDTO) {
-        consultarViaCep(dealerRequestDTO.endereco().cep());
-        Dealer dealer = dealerMapper.toEntity(dealerRequestDTO);
+        DealerRequestDTO dealerRequestComEnderecoOficialDTO = preencherEnderecoComViaCep(dealerRequestDTO);
+        Dealer dealer = dealerMapper.toEntity(dealerRequestComEnderecoOficialDTO);
         Dealer savedDealer = dealerRepository.save(dealer);
         return dealerMapper.toDTO(savedDealer);
     }
@@ -49,9 +52,9 @@ public class DealerService {
 
     @Transactional
     public DealerResponseDTO atualizar(Long dealerId, DealerRequestDTO dealerRequestDTO) {
-        consultarViaCep(dealerRequestDTO.endereco().cep());
+        DealerRequestDTO dealerRequestComEnderecoOficialDTO = preencherEnderecoComViaCep(dealerRequestDTO);
         Dealer dealer = buscarEntidadePorId(dealerId);
-        dealerMapper.updateEntityFromDto(dealerRequestDTO, dealer);
+        dealerMapper.updateEntityFromDto(dealerRequestComEnderecoOficialDTO, dealer);
         Dealer updatedDealer = dealerRepository.save(dealer);
         return dealerMapper.toDTO(updatedDealer);
     }
@@ -67,11 +70,40 @@ public class DealerService {
                 .orElseThrow(() -> new ResourceNotFoundException("Concessionária não encontrada com id " + dealerId));
     }
 
-    // Passo intermediário da issue #16: só consulta e registra o retorno do ViaCEP.
-    // Popular os campos do endereço com essa resposta e tratar CEP inválido/inexistente
-    // (sem quebrar a aplicação) ficam para os próximos itens da mesma issue.
-    private void consultarViaCep(String cep) {
-        ViaCepResponseDTO viaCepResponseDTO = viaCepClient.buscarEnderecoPorCep(cep);
+    // Substitui logradouro, bairro, cidade e estado pelo retorno oficial do ViaCEP,
+    // mantendo apenas o CEP digitado pelo usuário. O ViaCEP é tratado como fonte da
+    // verdade para esses campos, evitando divergência entre o CEP e o endereço salvo.
+    private DealerRequestDTO preencherEnderecoComViaCep(DealerRequestDTO dealerRequestDTO) {
+        String cep = dealerRequestDTO.endereco().cep();
+        ViaCepResponseDTO viaCepResponseDTO = consultarViaCep(cep);
+
+        EnderecoDTO enderecoOficialDTO = new EnderecoDTO(
+                viaCepResponseDTO.logradouro(),
+                viaCepResponseDTO.bairro(),
+                viaCepResponseDTO.localidade(),
+                viaCepResponseDTO.uf(),
+                cep);
+
+        return new DealerRequestDTO(dealerRequestDTO.razaoSocial(), dealerRequestDTO.cnpj(), enderecoOficialDTO);
+    }
+
+    // Trata os dois jeitos que uma consulta ao ViaCEP pode "dar errado": falha na chamada
+    // HTTP (rede indisponível, CEP fora do formato aceito pela API) e CEP inexistente
+    // (a API responde 200 OK com o corpo {"erro": true}, não com um status de erro HTTP).
+    private ViaCepResponseDTO consultarViaCep(String cep) {
+        ViaCepResponseDTO viaCepResponseDTO;
+        try {
+            viaCepResponseDTO = viaCepClient.buscarEnderecoPorCep(cep);
+        } catch (RestClientException restClientException) {
+            log.warn("Falha ao consultar ViaCEP para o CEP {}: {}", cep, restClientException.getMessage());
+            throw new CepInvalidoException("Não foi possível validar o CEP " + cep + " junto ao ViaCEP");
+        }
+
+        if (viaCepResponseDTO == null || Boolean.TRUE.equals(viaCepResponseDTO.erro())) {
+            throw new CepInvalidoException("CEP " + cep + " não encontrado");
+        }
+
         log.info("Consulta ViaCEP para o CEP {}: {}", cep, viaCepResponseDTO);
+        return viaCepResponseDTO;
     }
 }

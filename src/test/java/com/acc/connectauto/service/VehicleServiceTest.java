@@ -46,7 +46,7 @@ class VehicleServiceTest {
 
     @BeforeEach
     void configurarViaCepClient() {
-        when(viaCepClient.buscarEnderecoPorCep(anyString())).thenReturn(
+        when(viaCepClient.buscarEnderecoPorCep(anyString())).thenAnswer(invocation ->
                 new ViaCepResponseDTO("01310-100", "Av. Principal", "Centro", "São Paulo", "SP", null));
     }
 

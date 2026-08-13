@@ -14,12 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
 
 import com.acc.connectauto.client.ViaCepClient;
 import com.acc.connectauto.dto.EnderecoDTO;
 import com.acc.connectauto.dto.ViaCepResponseDTO;
 import com.acc.connectauto.dto.request.DealerRequestDTO;
 import com.acc.connectauto.dto.response.DealerResponseDTO;
+import com.acc.connectauto.exception.CepInvalidoException;
 import com.acc.connectauto.exception.ResourceNotFoundException;
 
 /**
@@ -37,10 +39,18 @@ class DealerServiceTest {
     @MockitoBean
     private ViaCepClient viaCepClient;
 
+    // Resposta varia por CEP para que os testes que criam dealers em cidades diferentes
+    // continuem representativos agora que o endereço é sobrescrito pelo retorno do ViaCEP.
     @BeforeEach
     void configurarViaCepClient() {
-        when(viaCepClient.buscarEnderecoPorCep(anyString())).thenReturn(
-                new ViaCepResponseDTO("01310-100", "Av. Principal", "Centro", "São Paulo", "SP", null));
+        when(viaCepClient.buscarEnderecoPorCep(anyString())).thenAnswer(invocation -> {
+            String cep = invocation.getArgument(0);
+            return switch (cep) {
+                case "80420100" -> new ViaCepResponseDTO("80420-100", "Rua das Flores", "Batel", "Curitiba", "PR", null);
+                case "13010000" -> new ViaCepResponseDTO("13010-000", "Av. Nova", "Jardins", "Campinas", "SP", null);
+                default -> new ViaCepResponseDTO("01310-100", "Av. Principal", "Centro", "São Paulo", "SP", null);
+            };
+        });
     }
 
     private DealerRequestDTO dealerRequestDTOValido() {
@@ -145,5 +155,50 @@ class DealerServiceTest {
         dealerService.atualizar(dealerResponseDTO.id(), dealerAtualizacaoRequestDTO);
 
         verify(viaCepClient).buscarEnderecoPorCep("13010000");
+    }
+
+    @Test
+    void devePopularEnderecoComRetornoDoViaCep() {
+        DealerRequestDTO dealerComEnderecoDigitadoDivergenteRequestDTO = new DealerRequestDTO(
+                "Auto Center Toyota Ltda",
+                "12345678000199",
+                new EnderecoDTO("Endereço qualquer", "Bairro qualquer", "Cidade qualquer", "XX", "01310100"));
+
+        DealerResponseDTO dealerResponseDTO = dealerService.criar(dealerComEnderecoDigitadoDivergenteRequestDTO);
+
+        assertThat(dealerResponseDTO.endereco().logradouro()).isEqualTo("Av. Principal");
+        assertThat(dealerResponseDTO.endereco().bairro()).isEqualTo("Centro");
+        assertThat(dealerResponseDTO.endereco().cidade()).isEqualTo("São Paulo");
+        assertThat(dealerResponseDTO.endereco().estado()).isEqualTo("SP");
+        assertThat(dealerResponseDTO.endereco().cep()).isEqualTo("01310100");
+    }
+
+    @Test
+    void deveLancarExcecaoAoCriarDealerComCepInexistente() {
+        when(viaCepClient.buscarEnderecoPorCep("00000000"))
+                .thenReturn(new ViaCepResponseDTO(null, null, null, null, null, true));
+
+        DealerRequestDTO dealerComCepInexistenteRequestDTO = new DealerRequestDTO(
+                "Auto Center Toyota Ltda",
+                "12345678000199",
+                new EnderecoDTO("Av. Principal, 100", "Centro", "São Paulo", "SP", "00000000"));
+
+        assertThatThrownBy(() -> dealerService.criar(dealerComCepInexistenteRequestDTO))
+                .isInstanceOf(CepInvalidoException.class)
+                .hasMessageContaining("00000000");
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoConsultaAoViaCepFalhar() {
+        when(viaCepClient.buscarEnderecoPorCep("99999999"))
+                .thenThrow(new RestClientException("Falha de rede simulada"));
+
+        DealerRequestDTO dealerComFalhaNaConsultaRequestDTO = new DealerRequestDTO(
+                "Auto Center Toyota Ltda",
+                "12345678000199",
+                new EnderecoDTO("Av. Principal, 100", "Centro", "São Paulo", "SP", "99999999"));
+
+        assertThatThrownBy(() -> dealerService.criar(dealerComFalhaNaConsultaRequestDTO))
+                .isInstanceOf(CepInvalidoException.class);
     }
 }
