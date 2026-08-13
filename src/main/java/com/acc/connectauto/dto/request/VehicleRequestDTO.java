@@ -25,5 +25,7 @@ public record VehicleRequestDTO(
 
                 @PositiveOrZero(message = "valor não pode ser negativo") BigDecimal valor,
 
-                String corInterna) {
+                String corInterna,
+
+                Long dealerId) {
 }

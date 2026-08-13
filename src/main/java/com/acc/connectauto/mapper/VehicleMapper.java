@@ -10,12 +10,15 @@ import com.acc.connectauto.entity.Vehicle;
 
 @Mapper(componentModel = "spring")
 public interface VehicleMapper {
-    @Mapping(target = "id", ignore = true)
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "dealer", ignore = true)
     Vehicle toEntity(VehicleRequestDTO vehicleRequestDTO);
 
+    @Mapping(source = "dealer.id", target = "dealerId")
     VehicleResponseDTO toDTO(Vehicle vehicle);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "dealer", ignore = true)
     void updateEntityFromDto(VehicleRequestDTO vehicleRequestDTO, @MappingTarget Vehicle vehicle);
 }

@@ -46,7 +46,7 @@ class VehicleControllerTest {
     private VehicleRequestDTO vehicleRequestDTOValido() {
         return new VehicleRequestDTO(
                 "Toyota", "Corolla", FuelType.FLEX, "Prata",
-                2024, "1HGCM82633A123456", new BigDecimal("120000.00"), null);
+                2024, "1HGCM82633A123456", new BigDecimal("120000.00"), null, null);
     }
 
     @Test
@@ -106,7 +106,7 @@ class VehicleControllerTest {
         VehicleResponseDTO vehicleResponseDTO = vehicleService.criar(vehicleRequestDTOValido());
         VehicleRequestDTO vehicleAtualizacaoRequestDTO = new VehicleRequestDTO(
                 "Toyota", "Corolla", FuelType.HIBRIDO, "Preto",
-                2025, "1HGCM82633A123456", new BigDecimal("135000.00"), "Bege");
+                2025, "1HGCM82633A123456", new BigDecimal("135000.00"), "Bege", null);
 
         mockMvc.perform(put("/vehicles/{vehicleId}", vehicleResponseDTO.id())
                         .contentType("application/json")

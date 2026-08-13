@@ -13,5 +13,6 @@ public record VehicleResponseDTO(
                 Integer ano,
                 String chassi,
                 BigDecimal valor,
-                String corInterna) {
+                String corInterna,
+                Long dealerId) {
 }

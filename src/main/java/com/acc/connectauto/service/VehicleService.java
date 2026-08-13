@@ -7,9 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.acc.connectauto.dto.request.VehicleRequestDTO;
 import com.acc.connectauto.dto.response.VehicleResponseDTO;
+import com.acc.connectauto.entity.Dealer;
 import com.acc.connectauto.entity.Vehicle;
 import com.acc.connectauto.exception.ResourceNotFoundException;
 import com.acc.connectauto.mapper.VehicleMapper;
+import com.acc.connectauto.repository.DealerRepository;
 import com.acc.connectauto.repository.VehicleRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -19,11 +21,13 @@ import lombok.RequiredArgsConstructor;
 public class VehicleService {
 
     private final VehicleRepository vehicleRepository;
+    private final DealerRepository dealerRepository;
     private final VehicleMapper vehicleMapper;
 
     @Transactional
     public VehicleResponseDTO criar(VehicleRequestDTO vehicleRequestDTO) {
         Vehicle vehicle = vehicleMapper.toEntity(vehicleRequestDTO);
+        vehicle.setDealer(buscarDealerOpcional(vehicleRequestDTO.dealerId()));
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
         return vehicleMapper.toDTO(savedVehicle);
     }
@@ -44,6 +48,7 @@ public class VehicleService {
     public VehicleResponseDTO atualizar(Long vehicleId, VehicleRequestDTO vehicleRequestDTO) {
         Vehicle vehicle = buscarEntidadePorId(vehicleId);
         vehicleMapper.updateEntityFromDto(vehicleRequestDTO, vehicle);
+        vehicle.setDealer(buscarDealerOpcional(vehicleRequestDTO.dealerId()));
         Vehicle updatedVehicle = vehicleRepository.save(vehicle);
         return vehicleMapper.toDTO(updatedVehicle);
     }
@@ -57,5 +62,13 @@ public class VehicleService {
     private Vehicle buscarEntidadePorId(Long vehicleId) {
         return vehicleRepository.findById(vehicleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado com id " + vehicleId));
+    }
+
+    private Dealer buscarDealerOpcional(Long dealerId) {
+        if (dealerId == null) {
+            return null;
+        }
+        return dealerRepository.findById(dealerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Concessionária não encontrada com id " + dealerId));
     }
 }
