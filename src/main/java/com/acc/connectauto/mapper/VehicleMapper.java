@@ -2,6 +2,7 @@ package com.acc.connectauto.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import com.acc.connectauto.dto.request.VehicleRequestDTO;
 import com.acc.connectauto.dto.response.VehicleResponseDTO;
@@ -14,4 +15,7 @@ public interface VehicleMapper {
     Vehicle toEntity(VehicleRequestDTO vehicleRequestDTO);
 
     VehicleResponseDTO toDTO(Vehicle vehicle);
+
+    @Mapping(target = "id", ignore = true)
+    void updateEntityFromDto(VehicleRequestDTO dto, @MappingTarget Vehicle entity);
 }
