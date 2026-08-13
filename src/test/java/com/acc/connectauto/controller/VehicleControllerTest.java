@@ -3,6 +3,7 @@ package com.acc.connectauto.controller;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -19,9 +20,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.acc.connectauto.dto.EnderecoDTO;
+import com.acc.connectauto.dto.request.DealerRequestDTO;
+import com.acc.connectauto.dto.request.VehicleDealerRequestDTO;
 import com.acc.connectauto.dto.request.VehicleRequestDTO;
+import com.acc.connectauto.dto.response.DealerResponseDTO;
 import com.acc.connectauto.dto.response.VehicleResponseDTO;
 import com.acc.connectauto.entity.FuelType;
+import com.acc.connectauto.service.DealerService;
 import com.acc.connectauto.service.VehicleService;
 
 import tools.jackson.databind.ObjectMapper;
@@ -43,10 +49,19 @@ class VehicleControllerTest {
     @Autowired
     private VehicleService vehicleService;
 
+    @Autowired
+    private DealerService dealerService;
+
     private VehicleRequestDTO vehicleRequestDTOValido() {
         return new VehicleRequestDTO(
                 "Toyota", "Corolla", FuelType.FLEX, "Prata",
                 2024, "1HGCM82633A123456", new BigDecimal("120000.00"), null, null);
+    }
+
+    private DealerResponseDTO criarDealer(String razaoSocial, String cnpj) {
+        return dealerService.criar(new DealerRequestDTO(
+                razaoSocial, cnpj,
+                new EnderecoDTO("Av. Principal, 100", "Centro", "São Paulo", "SP", "01310100")));
     }
 
     @Test
@@ -139,6 +154,28 @@ class VehicleControllerTest {
     @Test
     void deleteEmIdInexistenteDeveRetornar404() throws Exception {
         mockMvc.perform(delete("/vehicles/{vehicleId}", 999L))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void patchDealerDeveAssociarConcessionariaAoVeiculo() throws Exception {
+        VehicleResponseDTO vehicleResponseDTO = vehicleService.criar(vehicleRequestDTOValido());
+        DealerResponseDTO dealerResponseDTO = criarDealer("Honda Sul Ltda", "11222333000144");
+
+        mockMvc.perform(patch("/vehicles/{vehicleId}/dealer", vehicleResponseDTO.id())
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(new VehicleDealerRequestDTO(dealerResponseDTO.id()))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.dealerId").value(dealerResponseDTO.id()));
+    }
+
+    @Test
+    void patchDealerComDealerIdInexistenteDeveRetornar404() throws Exception {
+        VehicleResponseDTO vehicleResponseDTO = vehicleService.criar(vehicleRequestDTOValido());
+
+        mockMvc.perform(patch("/vehicles/{vehicleId}/dealer", vehicleResponseDTO.id())
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(new VehicleDealerRequestDTO(999L))))
                 .andExpect(status().isNotFound());
     }
 }

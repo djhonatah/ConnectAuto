@@ -17,10 +17,15 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 import com.acc.connectauto.dto.EnderecoDTO;
 import com.acc.connectauto.dto.request.DealerRequestDTO;
+import com.acc.connectauto.dto.request.VehicleRequestDTO;
 import com.acc.connectauto.dto.response.DealerResponseDTO;
+import com.acc.connectauto.entity.FuelType;
 import com.acc.connectauto.service.DealerService;
+import com.acc.connectauto.service.VehicleService;
 
 import tools.jackson.databind.ObjectMapper;
 
@@ -40,6 +45,9 @@ class DealerControllerTest {
 
     @Autowired
     private DealerService dealerService;
+
+    @Autowired
+    private VehicleService vehicleService;
 
     private DealerRequestDTO dealerRequestDTOValido() {
         return new DealerRequestDTO(
@@ -142,6 +150,28 @@ class DealerControllerTest {
     @Test
     void deleteEmIdInexistenteDeveRetornar404() throws Exception {
         mockMvc.perform(delete("/dealer/{dealerId}", 999L))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getVehiclesDeveListarVeiculosDaConcessionaria() throws Exception {
+        DealerResponseDTO dealerResponseDTO = dealerService.criar(dealerRequestDTOValido());
+        vehicleService.criar(new VehicleRequestDTO(
+                "Toyota", "Corolla", FuelType.FLEX, "Prata",
+                2024, "1HGCM82633A123456", new BigDecimal("120000.00"), null, dealerResponseDTO.id()));
+        vehicleService.criar(new VehicleRequestDTO(
+                "Honda", "Civic", FuelType.FLEX, "Branco",
+                2024, "9BWZZZ377VT004251", new BigDecimal("130000.00"), null, null));
+
+        mockMvc.perform(get("/dealer/{dealerId}/vehicles", dealerResponseDTO.id()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].modelo").value("Corolla"));
+    }
+
+    @Test
+    void getVehiclesEmDealerIdInexistenteDeveRetornar404() throws Exception {
+        mockMvc.perform(get("/dealer/{dealerId}/vehicles", 999L))
                 .andExpect(status().isNotFound());
     }
 }

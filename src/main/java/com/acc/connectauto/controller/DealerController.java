@@ -16,7 +16,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.acc.connectauto.dto.request.DealerRequestDTO;
 import com.acc.connectauto.dto.response.DealerResponseDTO;
+import com.acc.connectauto.dto.response.VehicleResponseDTO;
 import com.acc.connectauto.service.DealerService;
+import com.acc.connectauto.service.VehicleService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,10 @@ import lombok.RequiredArgsConstructor;
 public class DealerController {
 
     private final DealerService dealerService;
+
+    // Injetado só para o endpoint aninhado /dealer/{dealerId}/vehicles (issue #15) — o
+    // resto do controller continua falando exclusivamente com DealerService.
+    private final VehicleService vehicleService;
 
     @GetMapping
     public ResponseEntity<List<DealerResponseDTO>> listarTodos() {
@@ -66,5 +72,12 @@ public class DealerController {
     public ResponseEntity<Void> excluir(@PathVariable Long dealerId) {
         dealerService.excluir(dealerId);
         return ResponseEntity.noContent().build();
+    }
+
+    // Rota aninhada: lista os veículos da concessionária dealerId. 404 se o dealerId não
+    // existir (VehicleService.listarPorDealer valida antes de consultar os veículos).
+    @GetMapping("/{dealerId}/vehicles")
+    public ResponseEntity<List<VehicleResponseDTO>> listarVeiculos(@PathVariable Long dealerId) {
+        return ResponseEntity.ok(vehicleService.listarPorDealer(dealerId));
     }
 }

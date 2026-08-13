@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.acc.connectauto.dto.EnderecoDTO;
 import com.acc.connectauto.dto.request.DealerRequestDTO;
+import com.acc.connectauto.dto.request.VehicleDealerRequestDTO;
 import com.acc.connectauto.dto.request.VehicleRequestDTO;
 import com.acc.connectauto.dto.response.DealerResponseDTO;
 import com.acc.connectauto.dto.response.VehicleResponseDTO;
@@ -36,6 +37,12 @@ class VehicleServiceTest {
         return new VehicleRequestDTO(
                 "Toyota", "Corolla", FuelType.FLEX, "Prata",
                 2024, "1HGCM82633A123456", new BigDecimal("120000.00"), null, null);
+    }
+
+    private DealerResponseDTO criarDealer(String razaoSocial, String cnpj) {
+        return dealerService.criar(new DealerRequestDTO(
+                razaoSocial, cnpj,
+                new EnderecoDTO("Av. Principal, 100", "Centro", "São Paulo", "SP", "01310100")));
     }
 
     @Test
@@ -114,10 +121,7 @@ class VehicleServiceTest {
 
     @Test
     void deveCriarVeiculoComDealerAssociado() {
-        DealerResponseDTO dealerResponseDTO = dealerService.criar(new DealerRequestDTO(
-                "Auto Center Toyota Ltda",
-                "12345678000199",
-                new EnderecoDTO("Av. Principal, 100", "Centro", "São Paulo", "SP", "01310100")));
+        DealerResponseDTO dealerResponseDTO = criarDealer("Auto Center Toyota Ltda", "12345678000199");
 
         VehicleRequestDTO vehicleComDealerRequestDTO = new VehicleRequestDTO(
                 "Toyota", "Corolla", FuelType.FLEX, "Prata",
@@ -142,6 +146,68 @@ class VehicleServiceTest {
                 2024, "1HGCM82633A123456", new BigDecimal("120000.00"), null, 999L);
 
         assertThatThrownBy(() -> vehicleService.criar(vehicleComDealerInexistenteRequestDTO))
+                .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    void deveAssociarDealerAUmVeiculoExistente() {
+        VehicleResponseDTO vehicleResponseDTO = vehicleService.criar(vehicleRequestDTOValido());
+        DealerResponseDTO dealerResponseDTO = criarDealer("Honda Sul Ltda", "11222333000144");
+
+        VehicleResponseDTO updatedVehicleResponseDTO = vehicleService.associarDealer(
+                vehicleResponseDTO.id(), new VehicleDealerRequestDTO(dealerResponseDTO.id()));
+
+        assertThat(updatedVehicleResponseDTO.dealerId()).isEqualTo(dealerResponseDTO.id());
+    }
+
+    @Test
+    void deveRemoverDealerDeUmVeiculoQuandoDealerIdForNull() {
+        DealerResponseDTO dealerResponseDTO = criarDealer("Auto Center Toyota Ltda", "12345678000199");
+        VehicleRequestDTO vehicleComDealerRequestDTO = new VehicleRequestDTO(
+                "Toyota", "Corolla", FuelType.FLEX, "Prata",
+                2024, "1HGCM82633A123456", new BigDecimal("120000.00"), null, dealerResponseDTO.id());
+        VehicleResponseDTO vehicleResponseDTO = vehicleService.criar(vehicleComDealerRequestDTO);
+
+        VehicleResponseDTO updatedVehicleResponseDTO = vehicleService.associarDealer(
+                vehicleResponseDTO.id(), new VehicleDealerRequestDTO(null));
+
+        assertThat(updatedVehicleResponseDTO.dealerId()).isNull();
+    }
+
+    @Test
+    void deveLancarExcecaoAoAssociarDealerIdInexistente() {
+        VehicleResponseDTO vehicleResponseDTO = vehicleService.criar(vehicleRequestDTOValido());
+        VehicleDealerRequestDTO vehicleDealerRequestDTO = new VehicleDealerRequestDTO(999L);
+
+        assertThatThrownBy(() -> vehicleService.associarDealer(vehicleResponseDTO.id(), vehicleDealerRequestDTO))
+                .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    void deveListarVeiculosDeUmaConcessionariaEspecifica() {
+        DealerResponseDTO dealerResponseDTO = criarDealer("Auto Center Toyota Ltda", "12345678000199");
+        DealerResponseDTO outroDealerResponseDTO = criarDealer("Honda Sul Ltda", "11222333000144");
+
+        VehicleRequestDTO vehicleDoDealerRequestDTO = new VehicleRequestDTO(
+                "Toyota", "Corolla", FuelType.FLEX, "Prata",
+                2024, "1HGCM82633A123456", new BigDecimal("120000.00"), null, dealerResponseDTO.id());
+        VehicleRequestDTO vehicleDeOutroDealerRequestDTO = new VehicleRequestDTO(
+                "Honda", "Civic", FuelType.FLEX, "Branco",
+                2024, "9BWZZZ377VT004251", new BigDecimal("130000.00"), null, outroDealerResponseDTO.id());
+
+        vehicleService.criar(vehicleDoDealerRequestDTO);
+        vehicleService.criar(vehicleDeOutroDealerRequestDTO);
+        vehicleService.criar(vehicleRequestDTOValido());
+
+        List<VehicleResponseDTO> vehiclesDoDealer = vehicleService.listarPorDealer(dealerResponseDTO.id());
+
+        assertThat(vehiclesDoDealer).hasSize(1);
+        assertThat(vehiclesDoDealer.get(0).modelo()).isEqualTo("Corolla");
+    }
+
+    @Test
+    void deveLancarExcecaoAoListarVeiculosDeDealerIdInexistente() {
+        assertThatThrownBy(() -> vehicleService.listarPorDealer(999L))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 }

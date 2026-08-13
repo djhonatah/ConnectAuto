@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.acc.connectauto.dto.request.VehicleDealerRequestDTO;
 import com.acc.connectauto.dto.request.VehicleRequestDTO;
 import com.acc.connectauto.dto.response.VehicleResponseDTO;
 import com.acc.connectauto.entity.Dealer;
@@ -57,6 +58,28 @@ public class VehicleService {
     public void excluir(Long vehicleId) {
         Vehicle vehicle = buscarEntidadePorId(vehicleId);
         vehicleRepository.delete(vehicle);
+    }
+
+    // Altera (ou remove, se dealerId vier null) a concessionária de um veículo já
+    // existente, sem tocar em nenhum outro campo — diferente de atualizar(), que substitui
+    // o Vehicle inteiro a partir de um VehicleRequestDTO completo.
+    @Transactional
+    public VehicleResponseDTO associarDealer(Long vehicleId, VehicleDealerRequestDTO vehicleDealerRequestDTO) {
+        Vehicle vehicle = buscarEntidadePorId(vehicleId);
+        vehicle.setDealer(buscarDealerOpcional(vehicleDealerRequestDTO.dealerId()));
+        Vehicle updatedVehicle = vehicleRepository.save(vehicle);
+        return vehicleMapper.toDTO(updatedVehicle);
+    }
+
+    // existsById evita carregar o Dealer inteiro só para confirmar que ele existe.
+    @Transactional(readOnly = true)
+    public List<VehicleResponseDTO> listarPorDealer(Long dealerId) {
+        if (!dealerRepository.existsById(dealerId)) {
+            throw new ResourceNotFoundException("Concessionária não encontrada com id " + dealerId);
+        }
+        return vehicleRepository.findByDealer_Id(dealerId).stream()
+                .map(vehicleMapper::toDTO)
+                .toList();
     }
 
     private Vehicle buscarEntidadePorId(Long vehicleId) {
