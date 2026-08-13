@@ -12,10 +12,10 @@ import com.acc.connectauto.entity.Dealer;
 public interface DealerMapper {
 
     @Mapping(target = "id", ignore = true)
-    Dealer toEntity(DealerRequestDTO request);
+    Dealer toEntity(DealerRequestDTO dealerRequestDTO);
 
     DealerResponseDTO toDTO(Dealer dealer);
 
     @Mapping(target = "id", ignore = true)
-    void updateEntityFromDto(DealerRequestDTO dto, @MappingTarget Dealer entity);
+    void updateEntityFromDto(DealerRequestDTO dealerRequestDTO, @MappingTarget Dealer dealer);
 }

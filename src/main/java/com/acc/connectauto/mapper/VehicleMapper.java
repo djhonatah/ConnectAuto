@@ -17,5 +17,5 @@ public interface VehicleMapper {
     VehicleResponseDTO toDTO(Vehicle vehicle);
 
     @Mapping(target = "id", ignore = true)
-    void updateEntityFromDto(VehicleRequestDTO dto, @MappingTarget Vehicle entity);
+    void updateEntityFromDto(VehicleRequestDTO vehicleRequestDTO, @MappingTarget Vehicle vehicle);
 }

@@ -26,7 +26,7 @@ class VehicleServiceTest {
     @Autowired
     private VehicleService vehicleService;
 
-    private VehicleRequestDTO requestValido() {
+    private VehicleRequestDTO vehicleRequestDTOValido() {
         return new VehicleRequestDTO(
                 "Toyota", "Corolla", FuelType.FLEX, "Prata",
                 2024, "1HGCM82633A123456", new BigDecimal("120000.00"), null);
@@ -34,31 +34,31 @@ class VehicleServiceTest {
 
     @Test
     void deveCriarVeiculo() {
-        VehicleResponseDTO criado = vehicleService.criar(requestValido());
+        VehicleResponseDTO vehicleResponseDTO = vehicleService.criar(vehicleRequestDTOValido());
 
-        assertThat(criado.id()).isNotNull();
-        assertThat(criado.marca()).isEqualTo("Toyota");
-        assertThat(criado.tipoCombustivel()).isEqualTo(FuelType.FLEX);
+        assertThat(vehicleResponseDTO.id()).isNotNull();
+        assertThat(vehicleResponseDTO.marca()).isEqualTo("Toyota");
+        assertThat(vehicleResponseDTO.tipoCombustivel()).isEqualTo(FuelType.FLEX);
     }
 
     @Test
     void deveListarTodosOsVeiculos() {
-        vehicleService.criar(requestValido());
-        vehicleService.criar(requestValido());
+        vehicleService.criar(vehicleRequestDTOValido());
+        vehicleService.criar(vehicleRequestDTOValido());
 
-        List<VehicleResponseDTO> todos = vehicleService.listarTodos();
+        List<VehicleResponseDTO> vehicleResponseDTOs = vehicleService.listarTodos();
 
-        assertThat(todos).hasSize(2);
+        assertThat(vehicleResponseDTOs).hasSize(2);
     }
 
     @Test
     void deveBuscarVeiculoPorId() {
-        VehicleResponseDTO criado = vehicleService.criar(requestValido());
+        VehicleResponseDTO vehicleResponseDTO = vehicleService.criar(vehicleRequestDTOValido());
 
-        VehicleResponseDTO encontrado = vehicleService.buscarPorId(criado.id());
+        VehicleResponseDTO foundVehicleResponseDTO = vehicleService.buscarPorId(vehicleResponseDTO.id());
 
-        assertThat(encontrado.id()).isEqualTo(criado.id());
-        assertThat(encontrado.modelo()).isEqualTo("Corolla");
+        assertThat(foundVehicleResponseDTO.id()).isEqualTo(vehicleResponseDTO.id());
+        assertThat(foundVehicleResponseDTO.modelo()).isEqualTo("Corolla");
     }
 
     @Test
@@ -70,32 +70,33 @@ class VehicleServiceTest {
 
     @Test
     void deveAtualizarVeiculoExistente() {
-        VehicleResponseDTO criado = vehicleService.criar(requestValido());
-        VehicleRequestDTO atualizacao = new VehicleRequestDTO(
+        VehicleResponseDTO vehicleResponseDTO = vehicleService.criar(vehicleRequestDTOValido());
+        VehicleRequestDTO vehicleAtualizacaoRequestDTO = new VehicleRequestDTO(
                 "Toyota", "Corolla", FuelType.HIBRIDO, "Preto",
                 2025, "1HGCM82633A123456", new BigDecimal("135000.00"), "Bege");
 
-        VehicleResponseDTO atualizado = vehicleService.atualizar(criado.id(), atualizacao);
+        VehicleResponseDTO updatedVehicleResponseDTO =
+                vehicleService.atualizar(vehicleResponseDTO.id(), vehicleAtualizacaoRequestDTO);
 
-        assertThat(atualizado.id()).isEqualTo(criado.id());
-        assertThat(atualizado.cor()).isEqualTo("Preto");
-        assertThat(atualizado.tipoCombustivel()).isEqualTo(FuelType.HIBRIDO);
-        assertThat(atualizado.corInterna()).isEqualTo("Bege");
+        assertThat(updatedVehicleResponseDTO.id()).isEqualTo(vehicleResponseDTO.id());
+        assertThat(updatedVehicleResponseDTO.cor()).isEqualTo("Preto");
+        assertThat(updatedVehicleResponseDTO.tipoCombustivel()).isEqualTo(FuelType.HIBRIDO);
+        assertThat(updatedVehicleResponseDTO.corInterna()).isEqualTo("Bege");
     }
 
     @Test
     void deveLancarExcecaoAoAtualizarIdInexistente() {
-        assertThatThrownBy(() -> vehicleService.atualizar(999L, requestValido()))
+        assertThatThrownBy(() -> vehicleService.atualizar(999L, vehicleRequestDTOValido()))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test
     void deveExcluirVeiculo() {
-        VehicleResponseDTO criado = vehicleService.criar(requestValido());
+        VehicleResponseDTO vehicleResponseDTO = vehicleService.criar(vehicleRequestDTOValido());
 
-        vehicleService.excluir(criado.id());
+        vehicleService.excluir(vehicleResponseDTO.id());
 
-        assertThatThrownBy(() -> vehicleService.buscarPorId(criado.id()))
+        assertThatThrownBy(() -> vehicleService.buscarPorId(vehicleResponseDTO.id()))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 

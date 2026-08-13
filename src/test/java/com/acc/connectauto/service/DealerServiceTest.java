@@ -15,6 +15,9 @@ import com.acc.connectauto.dto.request.DealerRequestDTO;
 import com.acc.connectauto.dto.response.DealerResponseDTO;
 import com.acc.connectauto.exception.ResourceNotFoundException;
 
+/**
+ * Testes de integração de {@link DealerService}, com contexto Spring e H2 reais.
+ */
 @SpringBootTest
 @Transactional
 class DealerServiceTest {
@@ -22,7 +25,7 @@ class DealerServiceTest {
     @Autowired
     private DealerService dealerService;
 
-    private DealerRequestDTO requestValido() {
+    private DealerRequestDTO dealerRequestDTOValido() {
         return new DealerRequestDTO(
                 "Auto Center Toyota Ltda",
                 "12345678000199",
@@ -31,34 +34,34 @@ class DealerServiceTest {
 
     @Test
     void deveCriarDealer() {
-        DealerResponseDTO criado = dealerService.criar(requestValido());
+        DealerResponseDTO dealerResponseDTO = dealerService.criar(dealerRequestDTOValido());
 
-        assertThat(criado.id()).isNotNull();
-        assertThat(criado.razaoSocial()).isEqualTo("Auto Center Toyota Ltda");
-        assertThat(criado.endereco().cidade()).isEqualTo("São Paulo");
+        assertThat(dealerResponseDTO.id()).isNotNull();
+        assertThat(dealerResponseDTO.razaoSocial()).isEqualTo("Auto Center Toyota Ltda");
+        assertThat(dealerResponseDTO.endereco().cidade()).isEqualTo("São Paulo");
     }
 
     @Test
     void deveListarTodosOsDealers() {
-        dealerService.criar(requestValido());
+        dealerService.criar(dealerRequestDTOValido());
         dealerService.criar(new DealerRequestDTO(
                 "Honda Sul Ltda",
                 "11222333000144",
                 new EnderecoDTO("Rua das Flores, 200", "Batel", "Curitiba", "PR", "80420100")));
 
-        List<DealerResponseDTO> todos = dealerService.listarTodos();
+        List<DealerResponseDTO> dealerResponseDTOs = dealerService.listarTodos();
 
-        assertThat(todos).hasSize(2);
+        assertThat(dealerResponseDTOs).hasSize(2);
     }
 
     @Test
     void deveBuscarDealerPorId() {
-        DealerResponseDTO criado = dealerService.criar(requestValido());
+        DealerResponseDTO dealerResponseDTO = dealerService.criar(dealerRequestDTOValido());
 
-        DealerResponseDTO encontrado = dealerService.buscarPorId(criado.id());
+        DealerResponseDTO foundDealerResponseDTO = dealerService.buscarPorId(dealerResponseDTO.id());
 
-        assertThat(encontrado.id()).isEqualTo(criado.id());
-        assertThat(encontrado.cnpj()).isEqualTo("12345678000199");
+        assertThat(foundDealerResponseDTO.id()).isEqualTo(dealerResponseDTO.id());
+        assertThat(foundDealerResponseDTO.cnpj()).isEqualTo("12345678000199");
     }
 
     @Test
@@ -70,32 +73,33 @@ class DealerServiceTest {
 
     @Test
     void deveAtualizarDealerExistente() {
-        DealerResponseDTO criado = dealerService.criar(requestValido());
-        DealerRequestDTO atualizacao = new DealerRequestDTO(
+        DealerResponseDTO dealerResponseDTO = dealerService.criar(dealerRequestDTOValido());
+        DealerRequestDTO dealerAtualizacaoRequestDTO = new DealerRequestDTO(
                 "Auto Center Toyota S.A.",
                 "12345678000199",
                 new EnderecoDTO("Av. Nova, 500", "Jardins", "Campinas", "SP", "13010000"));
 
-        DealerResponseDTO atualizado = dealerService.atualizar(criado.id(), atualizacao);
+        DealerResponseDTO updatedDealerResponseDTO =
+                dealerService.atualizar(dealerResponseDTO.id(), dealerAtualizacaoRequestDTO);
 
-        assertThat(atualizado.id()).isEqualTo(criado.id());
-        assertThat(atualizado.razaoSocial()).isEqualTo("Auto Center Toyota S.A.");
-        assertThat(atualizado.endereco().cidade()).isEqualTo("Campinas");
+        assertThat(updatedDealerResponseDTO.id()).isEqualTo(dealerResponseDTO.id());
+        assertThat(updatedDealerResponseDTO.razaoSocial()).isEqualTo("Auto Center Toyota S.A.");
+        assertThat(updatedDealerResponseDTO.endereco().cidade()).isEqualTo("Campinas");
     }
 
     @Test
     void deveLancarExcecaoAoAtualizarIdInexistente() {
-        assertThatThrownBy(() -> dealerService.atualizar(999L, requestValido()))
+        assertThatThrownBy(() -> dealerService.atualizar(999L, dealerRequestDTOValido()))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test
     void deveExcluirDealer() {
-        DealerResponseDTO criado = dealerService.criar(requestValido());
+        DealerResponseDTO dealerResponseDTO = dealerService.criar(dealerRequestDTOValido());
 
-        dealerService.excluir(criado.id());
+        dealerService.excluir(dealerResponseDTO.id());
 
-        assertThatThrownBy(() -> dealerService.buscarPorId(criado.id()))
+        assertThatThrownBy(() -> dealerService.buscarPorId(dealerResponseDTO.id()))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 

@@ -43,7 +43,7 @@ class VehicleControllerTest {
     @Autowired
     private VehicleService vehicleService;
 
-    private VehicleRequestDTO requestValido() {
+    private VehicleRequestDTO vehicleRequestDTOValido() {
         return new VehicleRequestDTO(
                 "Toyota", "Corolla", FuelType.FLEX, "Prata",
                 2024, "1HGCM82633A123456", new BigDecimal("120000.00"), null);
@@ -53,7 +53,7 @@ class VehicleControllerTest {
     void postDeveCriarVeiculoERetornar201ComLocation() throws Exception {
         mockMvc.perform(post("/vehicles")
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(requestValido())))
+                        .content(objectMapper.writeValueAsString(vehicleRequestDTOValido())))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"))
                 .andExpect(jsonPath("$.id").exists())
@@ -63,21 +63,21 @@ class VehicleControllerTest {
 
     @Test
     void postComCamposObrigatoriosFaltandoDeveRetornar400() throws Exception {
-        String jsonInvalido = """
+        String vehicleJsonInvalido = """
                 {"marca": "", "modelo": null, "cor": "Prata"}
                 """;
 
         mockMvc.perform(post("/vehicles")
                         .contentType("application/json")
-                        .content(jsonInvalido))
+                        .content(vehicleJsonInvalido))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.details").isArray());
     }
 
     @Test
     void getVehiclesDeveListarTodos() throws Exception {
-        vehicleService.criar(requestValido());
-        vehicleService.criar(requestValido());
+        vehicleService.criar(vehicleRequestDTOValido());
+        vehicleService.criar(vehicleRequestDTOValido());
 
         mockMvc.perform(get("/vehicles"))
                 .andExpect(status().isOk())
@@ -86,31 +86,31 @@ class VehicleControllerTest {
 
     @Test
     void getVehiclesPorIdDeveRetornarVeiculoExistente() throws Exception {
-        VehicleResponseDTO criado = vehicleService.criar(requestValido());
+        VehicleResponseDTO vehicleResponseDTO = vehicleService.criar(vehicleRequestDTOValido());
 
-        mockMvc.perform(get("/vehicles/{id}", criado.id()))
+        mockMvc.perform(get("/vehicles/{vehicleId}", vehicleResponseDTO.id()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(criado.id()))
+                .andExpect(jsonPath("$.id").value(vehicleResponseDTO.id()))
                 .andExpect(jsonPath("$.marca").value("Toyota"));
     }
 
     @Test
     void getVehiclesPorIdInexistenteDeveRetornar404() throws Exception {
-        mockMvc.perform(get("/vehicles/{id}", 999L))
+        mockMvc.perform(get("/vehicles/{vehicleId}", 999L))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404));
     }
 
     @Test
     void putDeveAtualizarVeiculoExistente() throws Exception {
-        VehicleResponseDTO criado = vehicleService.criar(requestValido());
-        VehicleRequestDTO atualizacao = new VehicleRequestDTO(
+        VehicleResponseDTO vehicleResponseDTO = vehicleService.criar(vehicleRequestDTOValido());
+        VehicleRequestDTO vehicleAtualizacaoRequestDTO = new VehicleRequestDTO(
                 "Toyota", "Corolla", FuelType.HIBRIDO, "Preto",
                 2025, "1HGCM82633A123456", new BigDecimal("135000.00"), "Bege");
 
-        mockMvc.perform(put("/vehicles/{id}", criado.id())
+        mockMvc.perform(put("/vehicles/{vehicleId}", vehicleResponseDTO.id())
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(atualizacao)))
+                        .content(objectMapper.writeValueAsString(vehicleAtualizacaoRequestDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.cor").value("Preto"))
                 .andExpect(jsonPath("$.tipoCombustivel").value("HIBRIDO"));
@@ -118,27 +118,27 @@ class VehicleControllerTest {
 
     @Test
     void putEmIdInexistenteDeveRetornar404() throws Exception {
-        mockMvc.perform(put("/vehicles/{id}", 999L)
+        mockMvc.perform(put("/vehicles/{vehicleId}", 999L)
                         .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(requestValido())))
+                        .content(objectMapper.writeValueAsString(vehicleRequestDTOValido())))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void deleteDeveExcluirVeiculoERetornar204() throws Exception {
-        VehicleResponseDTO criado = vehicleService.criar(requestValido());
+        VehicleResponseDTO vehicleResponseDTO = vehicleService.criar(vehicleRequestDTOValido());
 
-        mockMvc.perform(delete("/vehicles/{id}", criado.id()))
+        mockMvc.perform(delete("/vehicles/{vehicleId}", vehicleResponseDTO.id()))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(""));
 
-        mockMvc.perform(get("/vehicles/{id}", criado.id()))
+        mockMvc.perform(get("/vehicles/{vehicleId}", vehicleResponseDTO.id()))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void deleteEmIdInexistenteDeveRetornar404() throws Exception {
-        mockMvc.perform(delete("/vehicles/{id}", 999L))
+        mockMvc.perform(delete("/vehicles/{vehicleId}", 999L))
                 .andExpect(status().isNotFound());
     }
 }

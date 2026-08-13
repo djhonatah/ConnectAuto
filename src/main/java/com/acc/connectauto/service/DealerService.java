@@ -22,10 +22,10 @@ public class DealerService {
     private final DealerMapper dealerMapper;
 
     @Transactional
-    public DealerResponseDTO criar(DealerRequestDTO request) {
-        Dealer dealer = dealerMapper.toEntity(request);
-        Dealer salvo = dealerRepository.save(dealer);
-        return dealerMapper.toDTO(salvo);
+    public DealerResponseDTO criar(DealerRequestDTO dealerRequestDTO) {
+        Dealer dealer = dealerMapper.toEntity(dealerRequestDTO);
+        Dealer savedDealer = dealerRepository.save(dealer);
+        return dealerMapper.toDTO(savedDealer);
     }
 
     @Transactional(readOnly = true)
@@ -36,26 +36,26 @@ public class DealerService {
     }
 
     @Transactional(readOnly = true)
-    public DealerResponseDTO buscarPorId(Long id) {
-        return dealerMapper.toDTO(buscarEntidadePorId(id));
+    public DealerResponseDTO buscarPorId(Long dealerId) {
+        return dealerMapper.toDTO(buscarEntidadePorId(dealerId));
     }
 
     @Transactional
-    public DealerResponseDTO atualizar(Long id, DealerRequestDTO request) {
-        Dealer dealer = buscarEntidadePorId(id);
-        dealerMapper.updateEntityFromDto(request, dealer);
-        Dealer atualizado = dealerRepository.save(dealer);
-        return dealerMapper.toDTO(atualizado);
+    public DealerResponseDTO atualizar(Long dealerId, DealerRequestDTO dealerRequestDTO) {
+        Dealer dealer = buscarEntidadePorId(dealerId);
+        dealerMapper.updateEntityFromDto(dealerRequestDTO, dealer);
+        Dealer updatedDealer = dealerRepository.save(dealer);
+        return dealerMapper.toDTO(updatedDealer);
     }
 
     @Transactional
-    public void excluir(Long id) {
-        Dealer dealer = buscarEntidadePorId(id);
+    public void excluir(Long dealerId) {
+        Dealer dealer = buscarEntidadePorId(dealerId);
         dealerRepository.delete(dealer);
     }
 
-    private Dealer buscarEntidadePorId(Long id) {
-        return dealerRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Concessionária não encontrada com id " + id));
+    private Dealer buscarEntidadePorId(Long dealerId) {
+        return dealerRepository.findById(dealerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Concessionária não encontrada com id " + dealerId));
     }
 }

@@ -22,10 +22,10 @@ public class VehicleService {
     private final VehicleMapper vehicleMapper;
 
     @Transactional
-    public VehicleResponseDTO criar(VehicleRequestDTO request) {
-        Vehicle vehicle = vehicleMapper.toEntity(request);
-        Vehicle salvo = vehicleRepository.save(vehicle);
-        return vehicleMapper.toDTO(salvo);
+    public VehicleResponseDTO criar(VehicleRequestDTO vehicleRequestDTO) {
+        Vehicle vehicle = vehicleMapper.toEntity(vehicleRequestDTO);
+        Vehicle savedVehicle = vehicleRepository.save(vehicle);
+        return vehicleMapper.toDTO(savedVehicle);
     }
 
     @Transactional(readOnly = true)
@@ -36,26 +36,26 @@ public class VehicleService {
     }
 
     @Transactional(readOnly = true)
-    public VehicleResponseDTO buscarPorId(Long id) {
-        return vehicleMapper.toDTO(buscarEntidadePorId(id));
+    public VehicleResponseDTO buscarPorId(Long vehicleId) {
+        return vehicleMapper.toDTO(buscarEntidadePorId(vehicleId));
     }
 
     @Transactional
-    public VehicleResponseDTO atualizar(Long id, VehicleRequestDTO request) {
-        Vehicle vehicle = buscarEntidadePorId(id);
-        vehicleMapper.updateEntityFromDto(request, vehicle);
-        Vehicle atualizado = vehicleRepository.save(vehicle);
-        return vehicleMapper.toDTO(atualizado);
+    public VehicleResponseDTO atualizar(Long vehicleId, VehicleRequestDTO vehicleRequestDTO) {
+        Vehicle vehicle = buscarEntidadePorId(vehicleId);
+        vehicleMapper.updateEntityFromDto(vehicleRequestDTO, vehicle);
+        Vehicle updatedVehicle = vehicleRepository.save(vehicle);
+        return vehicleMapper.toDTO(updatedVehicle);
     }
 
     @Transactional
-    public void excluir(Long id) {
-        Vehicle vehicle = buscarEntidadePorId(id);
+    public void excluir(Long vehicleId) {
+        Vehicle vehicle = buscarEntidadePorId(vehicleId);
         vehicleRepository.delete(vehicle);
     }
 
-    private Vehicle buscarEntidadePorId(Long id) {
-        return vehicleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado com id " + id));
+    private Vehicle buscarEntidadePorId(Long vehicleId) {
+        return vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado com id " + vehicleId));
     }
 }

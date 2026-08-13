@@ -13,29 +13,29 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiError> handleResourceNotFound(ResourceNotFoundException ex) {
-        ApiError body = new ApiError(
+    public ResponseEntity<ApiError> handleResourceNotFound(ResourceNotFoundException resourceNotFoundException) {
+        ApiError apiError = new ApiError(
                 HttpStatus.NOT_FOUND.value(),
                 HttpStatus.NOT_FOUND.getReasonPhrase(),
-                ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+                resourceNotFoundException.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException ex) {
-        List<String> details = ex.getBindingResult().getFieldErrors().stream()
+    public ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException methodArgumentNotValidException) {
+        List<String> fieldErrorMessages = methodArgumentNotValidException.getBindingResult().getFieldErrors().stream()
                 .map(this::formatFieldError)
                 .toList();
 
-        ApiError body = new ApiError(
+        ApiError apiError = new ApiError(
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 "Validation failed",
-                details);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+                fieldErrorMessages);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
     }
 
-    private String formatFieldError(FieldError error) {
-        return "%s: %s".formatted(error.getField(), error.getDefaultMessage());
+    private String formatFieldError(FieldError fieldError) {
+        return "%s: %s".formatted(fieldError.getField(), fieldError.getDefaultMessage());
     }
 }

@@ -31,19 +31,19 @@ class VehicleRepositoryTest {
                 .valor(new BigDecimal("120000.00"))
                 .build();
 
-        Vehicle salvo = vehicleRepository.save(vehicle);
-        assertThat(salvo.getId()).isNotNull();
+        Vehicle savedVehicle = vehicleRepository.save(vehicle);
+        assertThat(savedVehicle.getId()).isNotNull();
 
-        Optional<Vehicle> encontrado = vehicleRepository.findById(salvo.getId());
-        assertThat(encontrado).isPresent();
-        assertThat(encontrado.get().getMarca()).isEqualTo("Toyota");
+        Optional<Vehicle> foundVehicle = vehicleRepository.findById(savedVehicle.getId());
+        assertThat(foundVehicle).isPresent();
+        assertThat(foundVehicle.get().getMarca()).isEqualTo("Toyota");
 
-        salvo.setCor("Preto");
-        vehicleRepository.save(salvo);
-        assertThat(vehicleRepository.findById(salvo.getId()).get().getCor()).isEqualTo("Preto");
+        savedVehicle.setCor("Preto");
+        vehicleRepository.save(savedVehicle);
+        assertThat(vehicleRepository.findById(savedVehicle.getId()).get().getCor()).isEqualTo("Preto");
 
-        vehicleRepository.deleteById(salvo.getId());
-        assertThat(vehicleRepository.findById(salvo.getId())).isEmpty();
+        vehicleRepository.deleteById(savedVehicle.getId());
+        assertThat(vehicleRepository.findById(savedVehicle.getId())).isEmpty();
     }
 
     @Test
@@ -58,9 +58,9 @@ class VehicleRepositoryTest {
                 .marca("Toyota").modelo("Corolla").tipoCombustivel(FuelType.FLEX).cor("Prata")
                 .build());
 
-        List<Vehicle> hondas = vehicleRepository.findByMarca("Honda");
+        List<Vehicle> hondaVehicles = vehicleRepository.findByMarca("Honda");
 
-        assertThat(hondas).hasSize(2)
+        assertThat(hondaVehicles).hasSize(2)
                 .extracting(Vehicle::getModelo)
                 .containsExactlyInAnyOrder("Civic", "HR-V");
     }
@@ -74,10 +74,10 @@ class VehicleRepositoryTest {
                 .marca("Fiat").modelo("Mobi").tipoCombustivel(FuelType.FLEX).cor("Azul")
                 .build());
 
-        List<Vehicle> eletricos = vehicleRepository.findByTipoCombustivel(FuelType.ELETRICO);
+        List<Vehicle> eletricVehicles = vehicleRepository.findByTipoCombustivel(FuelType.ELETRICO);
 
-        assertThat(eletricos).hasSize(1);
-        assertThat(eletricos.get(0).getModelo()).isEqualTo("Kwid");
+        assertThat(eletricVehicles).hasSize(1);
+        assertThat(eletricVehicles.get(0).getModelo()).isEqualTo("Kwid");
     }
 
     @Test
@@ -87,9 +87,9 @@ class VehicleRepositoryTest {
                 .chassi("9BWZZZ377VT004251")
                 .build());
 
-        Optional<Vehicle> encontrado = vehicleRepository.findByChassi("9BWZZZ377VT004251");
+        Optional<Vehicle> foundVehicle = vehicleRepository.findByChassi("9BWZZZ377VT004251");
 
-        assertThat(encontrado).isPresent();
-        assertThat(encontrado.get().getModelo()).isEqualTo("Compass");
+        assertThat(foundVehicle).isPresent();
+        assertThat(foundVehicle.get().getModelo()).isEqualTo("Compass");
     }
 }

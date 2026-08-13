@@ -36,33 +36,33 @@ public class VehicleController {
         return ResponseEntity.ok(vehicleService.listarTodos());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<VehicleResponseDTO> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(vehicleService.buscarPorId(id));
+    @GetMapping("/{vehicleId}")
+    public ResponseEntity<VehicleResponseDTO> buscarPorId(@PathVariable Long vehicleId) {
+        return ResponseEntity.ok(vehicleService.buscarPorId(vehicleId));
     }
 
     @PostMapping
-    public ResponseEntity<VehicleResponseDTO> criar(@Valid @RequestBody VehicleRequestDTO request) {
-        VehicleResponseDTO criado = vehicleService.criar(request);
+    public ResponseEntity<VehicleResponseDTO> criar(@Valid @RequestBody VehicleRequestDTO vehicleRequestDTO) {
+        VehicleResponseDTO vehicleResponseDTO = vehicleService.criar(vehicleRequestDTO);
 
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(criado.id())
+        URI vehicleUri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{vehicleId}")
+                .buildAndExpand(vehicleResponseDTO.id())
                 .toUri();
 
-        return ResponseEntity.created(location).body(criado);
+        return ResponseEntity.created(vehicleUri).body(vehicleResponseDTO);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{vehicleId}")
     public ResponseEntity<VehicleResponseDTO> atualizar(
-            @PathVariable Long id,
-            @Valid @RequestBody VehicleRequestDTO request) {
-        return ResponseEntity.ok(vehicleService.atualizar(id, request));
+            @PathVariable Long vehicleId,
+            @Valid @RequestBody VehicleRequestDTO vehicleRequestDTO) {
+        return ResponseEntity.ok(vehicleService.atualizar(vehicleId, vehicleRequestDTO));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        vehicleService.excluir(id);
+    @DeleteMapping("/{vehicleId}")
+    public ResponseEntity<Void> excluir(@PathVariable Long vehicleId) {
+        vehicleService.excluir(vehicleId);
         return ResponseEntity.noContent().build();
     }
 }
