@@ -14,10 +14,6 @@ import com.acc.connectauto.repository.VehicleRepository;
 
 import lombok.RequiredArgsConstructor;
 
-/**
- * Regras de negócio de {@link Vehicle}. O controller nunca deve falar diretamente com
- * {@link VehicleRepository} ou {@link Vehicle} — só com esta classe, usando DTOs.
- */
 @Service
 @RequiredArgsConstructor
 public class VehicleService {
@@ -25,9 +21,6 @@ public class VehicleService {
     private final VehicleRepository vehicleRepository;
     private final VehicleMapper vehicleMapper;
 
-    /**
-     * Cria um novo veículo a partir dos dados do request.
-     */
     @Transactional
     public VehicleResponseDTO criar(VehicleRequestDTO request) {
         Vehicle vehicle = vehicleMapper.toEntity(request);
@@ -35,9 +28,6 @@ public class VehicleService {
         return vehicleMapper.toDTO(salvo);
     }
 
-    /**
-     * Lista todos os veículos cadastrados.
-     */
     @Transactional(readOnly = true)
     public List<VehicleResponseDTO> listarTodos() {
         return vehicleRepository.findAll().stream()
@@ -45,19 +35,11 @@ public class VehicleService {
                 .toList();
     }
 
-    /**
-     * Busca um veículo pelo id. Lança {@link ResourceNotFoundException} (traduzida para
-     * HTTP 404 pelo {@link com.acc.connectauto.exception.GlobalExceptionHandler}) se não existir.
-     */
     @Transactional(readOnly = true)
     public VehicleResponseDTO buscarPorId(Long id) {
         return vehicleMapper.toDTO(buscarEntidadePorId(id));
     }
 
-    /**
-     * Atualiza um veículo já existente com os dados do request. Lança
-     * {@link ResourceNotFoundException} se o id não existir.
-     */
     @Transactional
     public VehicleResponseDTO atualizar(Long id, VehicleRequestDTO request) {
         Vehicle vehicle = buscarEntidadePorId(id);
@@ -66,10 +48,6 @@ public class VehicleService {
         return vehicleMapper.toDTO(atualizado);
     }
 
-    /**
-     * Exclui um veículo pelo id. Lança {@link ResourceNotFoundException} se não existir —
-     * evita um "delete silencioso" de algo que nunca existiu.
-     */
     @Transactional
     public void excluir(Long id) {
         Vehicle vehicle = buscarEntidadePorId(id);
