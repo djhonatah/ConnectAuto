@@ -27,9 +27,7 @@ import com.acc.connectauto.service.VehicleService;
 import tools.jackson.databind.ObjectMapper;
 
 /**
- * Sobe a aplicação completa (incluindo a camada web real, via MockMvc) e chama os
- * endpoints HTTP de {@link VehicleController} exatamente como um cliente real faria,
- * verificando status HTTP e corpo JSON de cada resposta.
+ * Testes de integração dos endpoints HTTP de {@link VehicleController}, via MockMvc.
  */
 @SpringBootTest
 @AutoConfigureMockMvc

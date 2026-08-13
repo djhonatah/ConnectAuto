@@ -17,9 +17,7 @@ import com.acc.connectauto.entity.FuelType;
 import com.acc.connectauto.exception.ResourceNotFoundException;
 
 /**
- * Sobe o contexto Spring completo (com o H2 real configurado em application.properties) e
- * exercita o {@link VehicleService} de ponta a ponta: criação, listagem, busca, atualização,
- * exclusão e o caminho de erro (id inexistente).
+ * Testes de integração de {@link VehicleService}, com contexto Spring e H2 reais.
  */
 @SpringBootTest
 @Transactional

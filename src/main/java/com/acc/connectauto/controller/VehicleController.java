@@ -22,8 +22,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Endpoints REST de veículos. Só conhece {@link VehicleService} e DTOs — nunca a entidade
- * {@code Vehicle} nem o {@code VehicleRepository} diretamente.
+ * Endpoints REST de veículos. Expõe apenas {@link VehicleService} e DTOs.
  */
 @RestController
 @RequestMapping("/vehicles")
