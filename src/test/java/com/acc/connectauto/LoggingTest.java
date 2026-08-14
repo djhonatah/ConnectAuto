@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -121,5 +122,27 @@ class LoggingTest {
         dealerService.excluir(dealerId);
 
         assertThat(capturedOutput).contains("Concessionária excluída: id=" + dealerId);
+    }
+
+    @Test
+    void veiculoInexistenteDeveGerarLogDeWarn(CapturedOutput capturedOutput) throws Exception {
+        mockMvc.perform(get("/vehicles/{vehicleId}", 999L))
+                .andExpect(status().isNotFound());
+
+        assertThat(capturedOutput).contains("Recurso não encontrado: Veículo não encontrado com id 999");
+    }
+
+    @Test
+    void validacaoInvalidaDeveGerarLogDeWarn(CapturedOutput capturedOutput) throws Exception {
+        String vehicleJsonInvalido = """
+                {"marca": "", "modelo": null, "cor": "Prata"}
+                """;
+
+        mockMvc.perform(post("/vehicles")
+                        .contentType("application/json")
+                        .content(vehicleJsonInvalido))
+                .andExpect(status().isBadRequest());
+
+        assertThat(capturedOutput).contains("Erro de validação:");
     }
 }

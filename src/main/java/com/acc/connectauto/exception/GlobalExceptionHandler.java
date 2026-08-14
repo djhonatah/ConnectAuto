@@ -18,6 +18,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiError> handleResourceNotFound(ResourceNotFoundException resourceNotFoundException) {
+        log.warn("Recurso não encontrado: {}", resourceNotFoundException.getMessage());
+
         ApiError apiError = new ApiError(
                 HttpStatus.NOT_FOUND.value(),
                 HttpStatus.NOT_FOUND.getReasonPhrase(),
@@ -27,6 +29,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CepInvalidoException.class)
     public ResponseEntity<ApiError> handleCepInvalido(CepInvalidoException cepInvalidoException) {
+        log.warn("CEP inválido: {}", cepInvalidoException.getMessage());
+
         ApiError apiError = new ApiError(
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
@@ -40,6 +44,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiError> handleMessageNotReadable(
             HttpMessageNotReadableException httpMessageNotReadableException) {
+        log.warn("Corpo da requisição inválido: {}", httpMessageNotReadableException.getMostSpecificCause().getMessage());
+
         ApiError apiError = new ApiError(
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
@@ -52,6 +58,8 @@ public class GlobalExceptionHandler {
         List<String> fieldErrorMessages = methodArgumentNotValidException.getBindingResult().getFieldErrors().stream()
                 .map(this::formatFieldError)
                 .toList();
+
+        log.warn("Erro de validação: {}", fieldErrorMessages);
 
         ApiError apiError = new ApiError(
                 HttpStatus.BAD_REQUEST.value(),
