@@ -230,4 +230,18 @@ class DealerControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.details").isArray());
     }
+
+    @Test
+    void postComCepForaDoFormatoDeveRetornar400() throws Exception {
+        DealerRequestDTO dealerComCepForaDoFormatoRequestDTO = new DealerRequestDTO(
+                "Auto Center Toyota Ltda",
+                "12345678000195",
+                new EnderecoDTO("Av. Principal, 100", "Centro", "São Paulo", "SP", "ABCDE-123"));
+
+        mockMvc.perform(post("/dealer")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(dealerComCepForaDoFormatoRequestDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.details").isArray());
+    }
 }

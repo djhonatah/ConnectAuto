@@ -1,6 +1,7 @@
 package com.acc.connectauto.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record EnderecoDTO(
@@ -19,7 +20,7 @@ public record EnderecoDTO(
         String estado,
 
         @NotBlank(message = "cep é obrigatório")
-        @Size(min = 8, max = 8, message = "cep deve ter 8 dígitos")
+        @Pattern(regexp = "\\d{8}", message = "cep deve ter 8 dígitos numéricos")
         String cep
 ) {
 }
