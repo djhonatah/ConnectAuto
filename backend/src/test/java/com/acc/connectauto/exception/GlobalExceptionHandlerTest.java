@@ -17,12 +17,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.acc.connectauto.service.VehicleService;
 
-/**
- * Testa o catch-all de {@link GlobalExceptionHandler} para exceções não mapeadas.
- * {@link VehicleService} é substituído por um dublê só pra forçar uma exceção
- * inesperada de dentro de um endpoint real, sem precisar quebrar nada de propósito
- * na camada de persistência.
- */
 @SpringBootTest
 @AutoConfigureMockMvc
 class GlobalExceptionHandlerTest {

@@ -142,7 +142,8 @@ class DealerServiceTest {
                 DealerResponseDTO dealerResponseDTO = dealerService.criar(dealerRequestDTOValido());
                 vehicleService.criar(new VehicleRequestDTO(
                                 "Toyota", "Corolla", FuelType.FLEX, "Prata",
-                                2024, "1HGCM82633A123456", new java.math.BigDecimal("120000.00"), null, dealerResponseDTO.id()));
+                                2024, "1HGCM82633A123456", new java.math.BigDecimal("120000.00"), null,
+                                dealerResponseDTO.id()));
 
                 assertThatThrownBy(() -> dealerService.excluir(dealerResponseDTO.id()))
                                 .isInstanceOf(DealerComVeiculosAssociadosException.class);
@@ -255,8 +256,6 @@ class DealerServiceTest {
 
                 assertThat(updatedDealerResponseDTO.razaoSocial()).isEqualTo("Auto Center Toyota S.A.");
                 assertThat(updatedDealerResponseDTO.endereco().cidade()).isEqualTo("São Paulo");
-                // A consulta ao ViaCEP só deve ter acontecido uma vez, na criação — o CEP não
-                // mudou.
                 verify(viaCepClient).buscarEnderecoPorCep("01310100");
         }
 

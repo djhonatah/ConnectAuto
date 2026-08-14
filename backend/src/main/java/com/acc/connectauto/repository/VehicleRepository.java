@@ -14,7 +14,6 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
     List<Vehicle> findByTipoCombustivel(FuelType tipoCombustivel);
     Optional<Vehicle> findByChassi(String chassi);
 
-    // Navega pelo relacionamento @ManyToOne Vehicle.dealer até o id do Dealer associado.
     List<Vehicle> findByDealer_Id(Long dealerId);
 
     boolean existsByDealer_Id(Long dealerId);

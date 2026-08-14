@@ -36,9 +36,6 @@ public class DealerService {
     private final ViaCepMapper viaCepMapper;
     private final ViaCepClient viaCepClient;
 
-    // Sem @Transactional aqui de propósito: a consulta ao ViaCEP é uma chamada HTTP
-    // síncrona que não deve segurar uma conexão do pool de banco enquanto espera resposta.
-    // dealerRepository.save() já é transacional por conta própria (SimpleJpaRepository).
     public DealerResponseDTO criar(DealerRequestDTO dealerRequestDTO) {
         validarEnderecoInformado(dealerRequestDTO);
         EnderecoDTO enderecoOficialDTO = resolverEnderecoOficial(dealerRequestDTO.endereco());
@@ -60,7 +57,8 @@ public class DealerService {
         return dealerMapper.toDTO(buscarEntidadePorId(dealerId));
     }
 
-    // Mesmo motivo do criar(): sem @Transactional própria, pra não segurar conexão de
+    // Mesmo motivo do criar(): sem @Transactional própria, pra não segurar conexão
+    // de
     // banco durante a chamada ao ViaCEP.
     public DealerResponseDTO atualizar(Long dealerId, DealerRequestDTO dealerRequestDTO) {
         validarEnderecoInformado(dealerRequestDTO);
@@ -81,10 +79,6 @@ public class DealerService {
     @Transactional
     public void excluir(Long dealerId) {
         Dealer dealer = buscarEntidadePorId(dealerId);
-        // Checagem proativa em vez de deixar a FK do banco rejeitar o delete: o Hibernate
-        // faz sua própria validação de consistência do grafo de entidades no flush, ANTES
-        // de qualquer SQL ir ao banco, e lançaria TransientPropertyValueException nesse
-        // caso — um erro confuso e diferente do DataIntegrityViolationException esperado.
         if (vehicleRepository.existsByDealer_Id(dealerId)) {
             throw new DealerComVeiculosAssociadosException(
                     "Não é possível excluir a concessionária " + dealerId + ": existem veículos associados a ela.");
@@ -99,9 +93,6 @@ public class DealerService {
     }
 
     private void validarEnderecoInformado(DealerRequestDTO dealerRequestDTO) {
-        // Defesa contra chamada indevida ao service fora do fluxo HTTP validado por @Valid
-        // (ex.: outro service, job em lote, teste) — transforma um NPE opaco em uma
-        // mensagem clara sobre qual contrato foi violado.
         Objects.requireNonNull(dealerRequestDTO.endereco(), "endereco não pode ser nulo");
     }
 
@@ -109,8 +100,6 @@ public class DealerService {
         return dealerRequestDTO.endereco().cep().equals(dealer.getEndereco().getCep());
     }
 
-    // CEP não mudou: evita uma chamada desnecessária ao ViaCEP reaproveitando o endereço
-    // oficial já resolvido e persistido na atualização/criação anterior.
     private EnderecoDTO enderecoAtualDoDealer(Dealer dealer) {
         Endereco enderecoAtual = dealer.getEndereco();
         return new EnderecoDTO(
@@ -125,35 +114,28 @@ public class DealerService {
         return new DealerRequestDTO(dealerRequestDTO.razaoSocial(), dealerRequestDTO.cnpj(), enderecoDTO);
     }
 
-    // Consulta o ViaCEP e monta o endereço oficial (logradouro/bairro/cidade/estado
-    // vindos da API, cep mantido do que foi digitado). O ViaCEP é tratado como fonte da
-    // verdade para esses campos, evitando divergência entre o CEP e o endereço salvo.
     private EnderecoDTO resolverEnderecoOficial(EnderecoDTO enderecoOriginalDTO) {
         String cep = enderecoOriginalDTO.cep();
         ViaCepResponseDTO viaCepResponseDTO = consultarViaCep(cep);
-        ViaCepResponseDTO viaCepResponseComFallbackDTO = aplicarFallbackParaCamposNulos(viaCepResponseDTO, enderecoOriginalDTO);
+        ViaCepResponseDTO viaCepResponseComFallbackDTO = aplicarFallbackParaCamposNulos(viaCepResponseDTO,
+                enderecoOriginalDTO);
         return viaCepMapper.toEnderecoDTO(viaCepResponseComFallbackDTO, cep);
     }
 
-    // CEPs "genéricos" (comuns em cidades pequenas) podem vir do ViaCEP com logradouro
-    // e/ou bairro nulos, mesmo sem erro=true. As colunas de Endereco são NOT NULL, então
-    // mantemos o que o usuário digitou nesses dois campos quando o ViaCEP não tem o dado
-    // — evita quebrar o save() com DataIntegrityViolationException por um campo nulo.
-    private ViaCepResponseDTO aplicarFallbackParaCamposNulos(ViaCepResponseDTO viaCepResponseDTO, EnderecoDTO enderecoOriginalDTO) {
+    private ViaCepResponseDTO aplicarFallbackParaCamposNulos(ViaCepResponseDTO viaCepResponseDTO,
+            EnderecoDTO enderecoOriginalDTO) {
         String logradouro = viaCepResponseDTO.logradouro() != null
-                ? viaCepResponseDTO.logradouro() : enderecoOriginalDTO.logradouro();
+                ? viaCepResponseDTO.logradouro()
+                : enderecoOriginalDTO.logradouro();
         String bairro = viaCepResponseDTO.bairro() != null
-                ? viaCepResponseDTO.bairro() : enderecoOriginalDTO.bairro();
+                ? viaCepResponseDTO.bairro()
+                : enderecoOriginalDTO.bairro();
 
         return new ViaCepResponseDTO(
                 viaCepResponseDTO.cep(), logradouro, bairro,
                 viaCepResponseDTO.localidade(), viaCepResponseDTO.uf(), viaCepResponseDTO.erro());
     }
 
-    // Trata os dois jeitos que uma consulta ao ViaCEP pode "dar errado": falha na chamada
-    // HTTP (rede indisponível, timeout — CepIndisponivelException, 503, falha do ViaCEP)
-    // e CEP inexistente (a API responde 200 OK com {"erro": true} — CepInvalidoException,
-    // 400, erro do cliente). São causas diferentes e por isso exceções/status diferentes.
     private ViaCepResponseDTO consultarViaCep(String cep) {
         ViaCepResponseDTO viaCepResponseDTO;
         try {

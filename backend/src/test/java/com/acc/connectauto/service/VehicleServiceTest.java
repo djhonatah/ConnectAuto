@@ -26,14 +26,6 @@ import com.acc.connectauto.dto.response.VehicleResponseDTO;
 import com.acc.connectauto.entity.FuelType;
 import com.acc.connectauto.exception.ResourceNotFoundException;
 
-/**
- * Testes de integração de {@link VehicleService}, com contexto Spring e H2
- * reais.
- * {@link ViaCepClient} é substituído por um dublê (@MockitoBean) — os testes de
- * Vehicle
- * criam Dealers só como apoio, e não devem depender de uma chamada HTTP real ao
- * ViaCEP.
- */
 @SpringBootTest
 @Transactional
 class VehicleServiceTest {
@@ -123,9 +115,6 @@ class VehicleServiceTest {
 
     @Test
     void deveRemoverAssociacaoComDealerAoAtualizarSemDealerId() {
-        // PUT substitui o recurso inteiro: um veículo já associado a um dealer que recebe
-        // um PUT sem dealerId perde a associação, de propósito (comportamento fixado por
-        // este teste — para trocar só a associação sem esse efeito, use associarDealer).
         DealerResponseDTO dealerResponseDTO = criarDealer("Auto Center Toyota Ltda", "12345678000195");
         VehicleRequestDTO vehicleComDealerRequestDTO = new VehicleRequestDTO(
                 "Toyota", "Corolla", FuelType.FLEX, "Prata",
@@ -136,8 +125,8 @@ class VehicleServiceTest {
         VehicleRequestDTO vehicleAtualizacaoSemDealerRequestDTO = new VehicleRequestDTO(
                 "Toyota", "Corolla", FuelType.FLEX, "Preto",
                 2024, "1HGCM82633A123456", new BigDecimal("120000.00"), null, null);
-        VehicleResponseDTO updatedVehicleResponseDTO =
-                vehicleService.atualizar(vehicleResponseDTO.id(), vehicleAtualizacaoSemDealerRequestDTO);
+        VehicleResponseDTO updatedVehicleResponseDTO = vehicleService.atualizar(vehicleResponseDTO.id(),
+                vehicleAtualizacaoSemDealerRequestDTO);
 
         assertThat(updatedVehicleResponseDTO.dealerId()).isNull();
     }

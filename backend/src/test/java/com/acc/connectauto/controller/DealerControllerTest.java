@@ -50,10 +50,6 @@ class DealerControllerTest {
         @MockitoBean
         private ViaCepClient viaCepClient;
 
-        // Resposta varia por CEP para que os testes que criam dealers em cidades
-        // diferentes
-        // continuem representativos agora que o endereço é sobrescrito pelo retorno do
-        // ViaCEP.
         @BeforeEach
         void configurarViaCepClient() {
                 when(viaCepClient.buscarEnderecoPorCep(anyString())).thenAnswer(invocation -> {
@@ -261,30 +257,25 @@ class DealerControllerTest {
                                 .andExpect(status().isConflict());
         }
 
-    @Test
-    void deleteDealerComVeiculoAssociadoDeveRetornar409() throws Exception {
-        // Fluxo inteiro via MockMvc (criar dealer, criar veículo, excluir), não misturado
-        // com chamadas diretas ao service: dentro de um teste @Transactional, misturar os
-        // dois jeitos de acesso pode usar EntityManagers diferentes (OSIV por requisição
-        // do MockMvc vs. o EntityManager da transação do próprio teste) e gerar um erro de
-        // estado de entidade que não existe de verdade em produção.
-        String dealerResponseJson = mockMvc.perform(post("/dealer")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(dealerRequestDTOValido())))
-                        .andReturn().getResponse().getContentAsString();
-        Long dealerId = objectMapper.readTree(dealerResponseJson).get("id").asLong();
+        @Test
+        void deleteDealerComVeiculoAssociadoDeveRetornar409() throws Exception {
+                String dealerResponseJson = mockMvc.perform(post("/dealer")
+                                .contentType("application/json")
+                                .content(objectMapper.writeValueAsString(dealerRequestDTOValido())))
+                                .andReturn().getResponse().getContentAsString();
+                Long dealerId = objectMapper.readTree(dealerResponseJson).get("id").asLong();
 
-        VehicleRequestDTO vehicleComDealerRequestDTO = new VehicleRequestDTO(
-                "Toyota", "Corolla", FuelType.FLEX, "Prata",
-                2024, "1HGCM82633A123456", new BigDecimal("120000.00"), null, dealerId);
-        mockMvc.perform(post("/vehicles")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(vehicleComDealerRequestDTO)))
-                        .andExpect(status().isCreated());
+                VehicleRequestDTO vehicleComDealerRequestDTO = new VehicleRequestDTO(
+                                "Toyota", "Corolla", FuelType.FLEX, "Prata",
+                                2024, "1HGCM82633A123456", new BigDecimal("120000.00"), null, dealerId);
+                mockMvc.perform(post("/vehicles")
+                                .contentType("application/json")
+                                .content(objectMapper.writeValueAsString(vehicleComDealerRequestDTO)))
+                                .andExpect(status().isCreated());
 
-        mockMvc.perform(delete("/dealer/{dealerId}", dealerId))
-                        .andExpect(status().isConflict());
-    }
+                mockMvc.perform(delete("/dealer/{dealerId}", dealerId))
+                                .andExpect(status().isConflict());
+        }
 
         @Test
         void getComVehicleIdEmFormatoInvalidoDeveRetornar400() throws Exception {

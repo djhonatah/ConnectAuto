@@ -32,11 +32,6 @@ import com.acc.connectauto.service.DealerService;
 
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * Confirma, ponta a ponta via MockMvc + captura real de console (issue #19), que as
- * principais operações (criação, atualização, exclusão) geram log tanto no controller
- * quanto no service, no formato definido em application.properties.
- */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional

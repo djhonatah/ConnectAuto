@@ -33,24 +33,17 @@ public class GlobalExceptionHandler {
         return respond(HttpStatus.BAD_REQUEST, cepInvalidoException.getMessage());
     }
 
-    // Diferente de CepInvalidoException: aqui a falha é do ViaCEP (rede/timeout/serviço
-    // fora do ar), não do CEP em si — por isso 503, não 400.
     @ExceptionHandler(CepIndisponivelException.class)
     public ResponseEntity<ApiError> handleCepIndisponivel(CepIndisponivelException cepIndisponivelException) {
         log.warn("ViaCEP indisponível: {}", cepIndisponivelException.getMessage());
         return respond(HttpStatus.SERVICE_UNAVAILABLE, cepIndisponivelException.getMessage());
     }
 
-    // Cobre violações de constraint do banco não antecipadas por uma checagem própria no
-    // service (ex.: CNPJ ou chassi duplicado — o INSERT falha na constraint UNIQUE antes
-    // de qualquer verificação prévia). Sem esse handler, cai no catch-all e vira 500 mesmo
-    // sendo um erro do cliente. Casos onde dá pra checar antes (ex.: dealer com veículos
-    // associados) usam checagem proativa em vez de depender só disso — ver
-    // DealerService.excluir e DealerComVeiculosAssociadosException.
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiError> handleDataIntegrityViolation(
             DataIntegrityViolationException dataIntegrityViolationException) {
-        log.warn("Violação de integridade de dados: {}", dataIntegrityViolationException.getMostSpecificCause().getMessage());
+        log.warn("Violação de integridade de dados: {}",
+                dataIntegrityViolationException.getMostSpecificCause().getMessage());
         return respond(HttpStatus.CONFLICT,
                 "Operação viola uma restrição de integridade dos dados "
                         + "(ex.: valor único já cadastrado ou registro ainda referenciado por outro recurso).");
@@ -63,11 +56,6 @@ public class GlobalExceptionHandler {
         return respond(HttpStatus.CONFLICT, dealerComVeiculosAssociadosException.getMessage());
     }
 
-    // Cobre JSON malformado e valores fora do enum (ex.: "tipoCombustivel": "X") — o Jackson
-    // rejeita o valor antes mesmo do @Valid entrar em ação, então precisa de handler próprio
-    // pra não cair no tratamento de erro padrão do Spring (sem o formato ApiError). A
-    // mensagem original do Jackson fica só no log — o cliente recebe uma mensagem própria
-    // pra não vazar nome de classe/pacote interno da aplicação.
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiError> handleMessageNotReadable(
             HttpMessageNotReadableException httpMessageNotReadableException) {
@@ -98,9 +86,6 @@ public class GlobalExceptionHandler {
         return respond(HttpStatus.BAD_REQUEST, "Validation failed", fieldErrorMessages);
     }
 
-    // Ex.: GET /vehicles/abc, onde {vehicleId} espera um Long. Sem esse handler, o
-    // catch-all intercepta antes do resolvedor padrão do Spring e devolve 500 em vez do
-    // 400 que o Spring já daria de graça.
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ApiError> handleTypeMismatch(
             MethodArgumentTypeMismatchException methodArgumentTypeMismatchException) {
@@ -110,8 +95,6 @@ public class GlobalExceptionHandler {
         return respond(HttpStatus.BAD_REQUEST, message);
     }
 
-    // Ex.: PATCH /dealer/1, verbo não suportado nesse endpoint. Mesmo motivo do handler
-    // acima: preservar o 405 que o Spring já resolveria sozinho sem o catch-all.
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ApiError> handleMethodNotSupported(
             HttpRequestMethodNotSupportedException httpRequestMethodNotSupportedException) {
@@ -123,11 +106,6 @@ public class GlobalExceptionHandler {
         return "%s: %s".formatted(fieldError.getField(), fieldError.getDefaultMessage());
     }
 
-    // Catch-all: qualquer exceção não mapeada pelos handlers acima. A stack trace e a
-    // mensagem original vão só pro log do servidor — o cliente recebe uma mensagem
-    // genérica, nunca detalhes internos da aplicação. Fica por último na leitura do
-    // arquivo só por convenção; o Spring já escolhe o handler mais específico disponível
-    // para cada exceção, independente da ordem de declaração.
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleUnexpected(Exception exception) {
         log.error("Erro inesperado não tratado", exception);

@@ -40,14 +40,6 @@ import com.acc.connectauto.service.VehicleService;
 
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * Testes de integração dos endpoints HTTP de {@link VehicleController}, via
- * MockMvc.
- * {@link ViaCepClient} é substituído por um dublê (@MockitoBean) — os testes de
- * Vehicle
- * criam Dealers só como apoio, e não devem depender de uma chamada HTTP real ao
- * ViaCEP.
- */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional

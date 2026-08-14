@@ -13,10 +13,6 @@ import org.springframework.web.client.RestClient;
 
 import com.acc.connectauto.dto.ViaCepResponseDTO;
 
-/**
- * Testa {@link ViaCepClient} isoladamente: MockRestServiceServer intercepta a chamada HTTP
- * antes dela sair para a rede, então este teste não depende de internet nem do ViaCEP real.
- */
 class ViaCepClientTest {
 
     @Test

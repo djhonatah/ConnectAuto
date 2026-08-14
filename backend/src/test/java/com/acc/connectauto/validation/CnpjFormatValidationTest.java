@@ -13,12 +13,6 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 
-/**
- * Testa a combinação @Pattern + @CNPJ (org.hibernate.validator.constraints.br.CNPJ) usada
- * em DealerRequestDTO.cnpj, sem contexto Spring. O dígito verificador é calculado pela
- * própria Hibernate Validator; @Pattern garante que só o formato de 14 dígitos sem
- * máscara é aceito (o mesmo contrato do validador caseiro que este substitui).
- */
 class CnpjFormatValidationTest {
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
