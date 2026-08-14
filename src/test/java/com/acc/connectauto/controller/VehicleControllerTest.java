@@ -1,5 +1,6 @@
 package com.acc.connectauto.controller;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -91,6 +92,23 @@ class VehicleControllerTest {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.marca").value("Toyota"))
                 .andExpect(jsonPath("$.modelo").value("Corolla"));
+    }
+
+    @Test
+    void postComTipoCombustivelInvalidoDeveRetornar400() throws Exception {
+        String vehicleJsonComEnumInvalido = """
+                {"marca": "Toyota", "modelo": "Corolla", "tipoCombustivel": "NUCLEAR",
+                 "cor": "Prata", "ano": 2024, "chassi": "1HGCM82633A123456", "valor": 120000.00}
+                """;
+
+        mockMvc.perform(post("/vehicles")
+                        .contentType("application/json")
+                        .content(vehicleJsonComEnumInvalido))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value(containsString(
+                        "not one of the values accepted for Enum class")))
+                .andExpect(jsonPath("$.message").value(containsString("GASOLINA")));
     }
 
     @Test
