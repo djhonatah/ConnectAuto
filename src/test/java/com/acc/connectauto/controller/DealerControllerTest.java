@@ -77,7 +77,7 @@ class DealerControllerTest {
     private DealerRequestDTO dealerRequestDTOValido() {
         return new DealerRequestDTO(
                 "Auto Center Toyota Ltda",
-                "12345678000199",
+                "12345678000195",
                 new EnderecoDTO("Av. Principal, 100", "Centro", "São Paulo", "SP", "01310100"));
     }
 
@@ -111,7 +111,7 @@ class DealerControllerTest {
         dealerService.criar(dealerRequestDTOValido());
         dealerService.criar(new DealerRequestDTO(
                 "Honda Sul Ltda",
-                "11222333000144",
+                "11222333000181",
                 new EnderecoDTO("Rua das Flores, 200", "Batel", "Curitiba", "PR", "80420100")));
 
         mockMvc.perform(get("/dealer"))
@@ -141,7 +141,7 @@ class DealerControllerTest {
         DealerResponseDTO dealerResponseDTO = dealerService.criar(dealerRequestDTOValido());
         DealerRequestDTO dealerAtualizacaoRequestDTO = new DealerRequestDTO(
                 "Auto Center Toyota S.A.",
-                "12345678000199",
+                "12345678000195",
                 new EnderecoDTO("Av. Nova, 500", "Jardins", "Campinas", "SP", "13010000"));
 
         mockMvc.perform(put("/dealer/{dealerId}", dealerResponseDTO.id())
@@ -207,7 +207,7 @@ class DealerControllerTest {
 
         DealerRequestDTO dealerComCepInexistenteRequestDTO = new DealerRequestDTO(
                 "Auto Center Toyota Ltda",
-                "12345678000199",
+                "12345678000195",
                 new EnderecoDTO("Av. Principal, 100", "Centro", "São Paulo", "SP", "00000000"));
 
         mockMvc.perform(post("/dealer")
@@ -215,5 +215,19 @@ class DealerControllerTest {
                         .content(objectMapper.writeValueAsString(dealerComCepInexistenteRequestDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("CEP 00000000 não encontrado"));
+    }
+
+    @Test
+    void postComCnpjComDigitoVerificadorInvalidoDeveRetornar400() throws Exception {
+        DealerRequestDTO dealerComCnpjInvalidoRequestDTO = new DealerRequestDTO(
+                "Auto Center Toyota Ltda",
+                "12345678000199",
+                new EnderecoDTO("Av. Principal, 100", "Centro", "São Paulo", "SP", "01310100"));
+
+        mockMvc.perform(post("/dealer")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(dealerComCnpjInvalidoRequestDTO)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.details").isArray());
     }
 }

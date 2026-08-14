@@ -138,7 +138,7 @@ class VehicleServiceTest {
 
     @Test
     void deveCriarVeiculoComDealerAssociado() {
-        DealerResponseDTO dealerResponseDTO = criarDealer("Auto Center Toyota Ltda", "12345678000199");
+        DealerResponseDTO dealerResponseDTO = criarDealer("Auto Center Toyota Ltda", "12345678000195");
 
         VehicleRequestDTO vehicleComDealerRequestDTO = new VehicleRequestDTO(
                 "Toyota", "Corolla", FuelType.FLEX, "Prata",
@@ -169,7 +169,7 @@ class VehicleServiceTest {
     @Test
     void deveAssociarDealerAUmVeiculoExistente() {
         VehicleResponseDTO vehicleResponseDTO = vehicleService.criar(vehicleRequestDTOValido());
-        DealerResponseDTO dealerResponseDTO = criarDealer("Honda Sul Ltda", "11222333000144");
+        DealerResponseDTO dealerResponseDTO = criarDealer("Honda Sul Ltda", "11222333000181");
 
         VehicleResponseDTO updatedVehicleResponseDTO = vehicleService.associarDealer(
                 vehicleResponseDTO.id(), new VehicleDealerRequestDTO(dealerResponseDTO.id()));
@@ -179,7 +179,7 @@ class VehicleServiceTest {
 
     @Test
     void deveRemoverDealerDeUmVeiculoQuandoDealerIdForNull() {
-        DealerResponseDTO dealerResponseDTO = criarDealer("Auto Center Toyota Ltda", "12345678000199");
+        DealerResponseDTO dealerResponseDTO = criarDealer("Auto Center Toyota Ltda", "12345678000195");
         VehicleRequestDTO vehicleComDealerRequestDTO = new VehicleRequestDTO(
                 "Toyota", "Corolla", FuelType.FLEX, "Prata",
                 2024, "1HGCM82633A123456", new BigDecimal("120000.00"), null, dealerResponseDTO.id());
@@ -202,8 +202,8 @@ class VehicleServiceTest {
 
     @Test
     void deveListarVeiculosDeUmaConcessionariaEspecifica() {
-        DealerResponseDTO dealerResponseDTO = criarDealer("Auto Center Toyota Ltda", "12345678000199");
-        DealerResponseDTO outroDealerResponseDTO = criarDealer("Honda Sul Ltda", "11222333000144");
+        DealerResponseDTO dealerResponseDTO = criarDealer("Auto Center Toyota Ltda", "12345678000195");
+        DealerResponseDTO outroDealerResponseDTO = criarDealer("Honda Sul Ltda", "11222333000181");
 
         VehicleRequestDTO vehicleDoDealerRequestDTO = new VehicleRequestDTO(
                 "Toyota", "Corolla", FuelType.FLEX, "Prata",

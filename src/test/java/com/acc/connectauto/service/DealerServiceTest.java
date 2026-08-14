@@ -56,7 +56,7 @@ class DealerServiceTest {
     private DealerRequestDTO dealerRequestDTOValido() {
         return new DealerRequestDTO(
                 "Auto Center Toyota Ltda",
-                "12345678000199",
+                "12345678000195",
                 new EnderecoDTO("Av. Principal, 100", "Centro", "São Paulo", "SP", "01310100"));
     }
 
@@ -74,7 +74,7 @@ class DealerServiceTest {
         dealerService.criar(dealerRequestDTOValido());
         dealerService.criar(new DealerRequestDTO(
                 "Honda Sul Ltda",
-                "11222333000144",
+                "11222333000181",
                 new EnderecoDTO("Rua das Flores, 200", "Batel", "Curitiba", "PR", "80420100")));
 
         List<DealerResponseDTO> dealerResponseDTOs = dealerService.listarTodos();
@@ -89,7 +89,7 @@ class DealerServiceTest {
         DealerResponseDTO foundDealerResponseDTO = dealerService.buscarPorId(dealerResponseDTO.id());
 
         assertThat(foundDealerResponseDTO.id()).isEqualTo(dealerResponseDTO.id());
-        assertThat(foundDealerResponseDTO.cnpj()).isEqualTo("12345678000199");
+        assertThat(foundDealerResponseDTO.cnpj()).isEqualTo("12345678000195");
     }
 
     @Test
@@ -104,7 +104,7 @@ class DealerServiceTest {
         DealerResponseDTO dealerResponseDTO = dealerService.criar(dealerRequestDTOValido());
         DealerRequestDTO dealerAtualizacaoRequestDTO = new DealerRequestDTO(
                 "Auto Center Toyota S.A.",
-                "12345678000199",
+                "12345678000195",
                 new EnderecoDTO("Av. Nova, 500", "Jardins", "Campinas", "SP", "13010000"));
 
         DealerResponseDTO updatedDealerResponseDTO =
@@ -149,7 +149,7 @@ class DealerServiceTest {
         DealerResponseDTO dealerResponseDTO = dealerService.criar(dealerRequestDTOValido());
         DealerRequestDTO dealerAtualizacaoRequestDTO = new DealerRequestDTO(
                 "Auto Center Toyota S.A.",
-                "12345678000199",
+                "12345678000195",
                 new EnderecoDTO("Av. Nova, 500", "Jardins", "Campinas", "SP", "13010000"));
 
         dealerService.atualizar(dealerResponseDTO.id(), dealerAtualizacaoRequestDTO);
@@ -161,7 +161,7 @@ class DealerServiceTest {
     void devePopularEnderecoComRetornoDoViaCep() {
         DealerRequestDTO dealerComEnderecoDigitadoDivergenteRequestDTO = new DealerRequestDTO(
                 "Auto Center Toyota Ltda",
-                "12345678000199",
+                "12345678000195",
                 new EnderecoDTO("Endereço qualquer", "Bairro qualquer", "Cidade qualquer", "XX", "01310100"));
 
         DealerResponseDTO dealerResponseDTO = dealerService.criar(dealerComEnderecoDigitadoDivergenteRequestDTO);
@@ -180,7 +180,7 @@ class DealerServiceTest {
 
         DealerRequestDTO dealerComCepInexistenteRequestDTO = new DealerRequestDTO(
                 "Auto Center Toyota Ltda",
-                "12345678000199",
+                "12345678000195",
                 new EnderecoDTO("Av. Principal, 100", "Centro", "São Paulo", "SP", "00000000"));
 
         assertThatThrownBy(() -> dealerService.criar(dealerComCepInexistenteRequestDTO))
@@ -195,7 +195,7 @@ class DealerServiceTest {
 
         DealerRequestDTO dealerComFalhaNaConsultaRequestDTO = new DealerRequestDTO(
                 "Auto Center Toyota Ltda",
-                "12345678000199",
+                "12345678000195",
                 new EnderecoDTO("Av. Principal, 100", "Centro", "São Paulo", "SP", "99999999"));
 
         assertThatThrownBy(() -> dealerService.criar(dealerComFalhaNaConsultaRequestDTO))

@@ -177,7 +177,7 @@ class VehicleControllerTest {
     @Test
     void patchDealerDeveAssociarConcessionariaAoVeiculo() throws Exception {
         VehicleResponseDTO vehicleResponseDTO = vehicleService.criar(vehicleRequestDTOValido());
-        DealerResponseDTO dealerResponseDTO = criarDealer("Honda Sul Ltda", "11222333000144");
+        DealerResponseDTO dealerResponseDTO = criarDealer("Honda Sul Ltda", "11222333000181");
 
         mockMvc.perform(patch("/vehicles/{vehicleId}/dealer", vehicleResponseDTO.id())
                         .contentType("application/json")
