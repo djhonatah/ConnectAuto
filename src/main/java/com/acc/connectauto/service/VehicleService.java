@@ -59,10 +59,7 @@ public class VehicleService {
         Vehicle vehicle = buscarEntidadePorId(vehicleId);
         vehicleRepository.delete(vehicle);
     }
-
-    // Altera (ou remove, se dealerId vier null) a concessionária de um veículo já
-    // existente, sem tocar em nenhum outro campo — diferente de atualizar(), que substitui
-    // o Vehicle inteiro a partir de um VehicleRequestDTO completo.
+.
     @Transactional
     public VehicleResponseDTO associarDealer(Long vehicleId, VehicleDealerRequestDTO vehicleDealerRequestDTO) {
         Vehicle vehicle = buscarEntidadePorId(vehicleId);
@@ -71,7 +68,6 @@ public class VehicleService {
         return vehicleMapper.toDTO(updatedVehicle);
     }
 
-    // existsById evita carregar o Dealer inteiro só para confirmar que ele existe.
     @Transactional(readOnly = true)
     public List<VehicleResponseDTO> listarPorDealer(Long dealerId) {
         if (!dealerRepository.existsById(dealerId)) {
