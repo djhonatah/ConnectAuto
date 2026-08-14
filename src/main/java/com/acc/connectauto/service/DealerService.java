@@ -34,10 +34,10 @@ public class DealerService {
         DealerRequestDTO dealerRequestComEnderecoOficialDTO = preencherEnderecoComViaCep(dealerRequestDTO);
         Dealer dealer = dealerMapper.toEntity(dealerRequestComEnderecoOficialDTO);
         Dealer savedDealer = dealerRepository.save(dealer);
+        log.info("Concessionária criada: id={}, cnpj={}", savedDealer.getId(), savedDealer.getCnpj());
         return dealerMapper.toDTO(savedDealer);
     }
 
-    // readOnly = true: dispensa o dirty-checking do Hibernate nesta transação de leitura.
     @Transactional(readOnly = true)
     public List<DealerResponseDTO> listarTodos() {
         return dealerRepository.findAll().stream()
@@ -56,6 +56,7 @@ public class DealerService {
         Dealer dealer = buscarEntidadePorId(dealerId);
         dealerMapper.updateEntityFromDto(dealerRequestComEnderecoOficialDTO, dealer);
         Dealer updatedDealer = dealerRepository.save(dealer);
+        log.info("Concessionária atualizada: id={}", updatedDealer.getId());
         return dealerMapper.toDTO(updatedDealer);
     }
 
@@ -63,6 +64,7 @@ public class DealerService {
     public void excluir(Long dealerId) {
         Dealer dealer = buscarEntidadePorId(dealerId);
         dealerRepository.delete(dealer);
+        log.info("Concessionária excluída: id={}", dealerId);
     }
 
     private Dealer buscarEntidadePorId(Long dealerId) {
@@ -70,9 +72,6 @@ public class DealerService {
                 .orElseThrow(() -> new ResourceNotFoundException("Concessionária não encontrada com id " + dealerId));
     }
 
-    // Substitui logradouro, bairro, cidade e estado pelo retorno oficial do ViaCEP,
-    // mantendo apenas o CEP digitado pelo usuário. O ViaCEP é tratado como fonte da
-    // verdade para esses campos, evitando divergência entre o CEP e o endereço salvo.
     private DealerRequestDTO preencherEnderecoComViaCep(DealerRequestDTO dealerRequestDTO) {
         String cep = dealerRequestDTO.endereco().cep();
         ViaCepResponseDTO viaCepResponseDTO = consultarViaCep(cep);
@@ -87,9 +86,6 @@ public class DealerService {
         return new DealerRequestDTO(dealerRequestDTO.razaoSocial(), dealerRequestDTO.cnpj(), enderecoOficialDTO);
     }
 
-    // Trata os dois jeitos que uma consulta ao ViaCEP pode "dar errado": falha na chamada
-    // HTTP (rede indisponível, CEP fora do formato aceito pela API) e CEP inexistente
-    // (a API responde 200 OK com o corpo {"erro": true}, não com um status de erro HTTP).
     private ViaCepResponseDTO consultarViaCep(String cep) {
         ViaCepResponseDTO viaCepResponseDTO;
         try {

@@ -22,21 +22,16 @@ import com.acc.connectauto.service.VehicleService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
-// Rota no singular ("/dealer") conforme especificado na issue #12 —
-// inconsistente com o
-// plural usado em VehicleController ("/vehicles"). Mantido assim de propósito;
-// avaliar
-// padronização para "/dealers" se a API crescer.
 @RequestMapping("/dealer")
 @RequiredArgsConstructor
 public class DealerController {
 
     private final DealerService dealerService;
 
-    // Injetado só para o endpoint aninhado /dealer/{dealerId}/vehicles (issue #15) — o
-    // resto do controller continua falando exclusivamente com DealerService.
     private final VehicleService vehicleService;
 
     @GetMapping
@@ -51,6 +46,7 @@ public class DealerController {
 
     @PostMapping
     public ResponseEntity<DealerResponseDTO> criar(@Valid @RequestBody DealerRequestDTO dealerRequestDTO) {
+        log.info("POST /dealer - criando concessionária: razaoSocial={}", dealerRequestDTO.razaoSocial());
         DealerResponseDTO dealerResponseDTO = dealerService.criar(dealerRequestDTO);
 
         URI dealerUri = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -65,17 +61,17 @@ public class DealerController {
     public ResponseEntity<DealerResponseDTO> atualizar(
             @PathVariable Long dealerId,
             @Valid @RequestBody DealerRequestDTO dealerRequestDTO) {
+        log.info("PUT /dealer/{} - atualizando concessionária", dealerId);
         return ResponseEntity.ok(dealerService.atualizar(dealerId, dealerRequestDTO));
     }
 
     @DeleteMapping("/{dealerId}")
     public ResponseEntity<Void> excluir(@PathVariable Long dealerId) {
+        log.info("DELETE /dealer/{} - excluindo concessionária", dealerId);
         dealerService.excluir(dealerId);
         return ResponseEntity.noContent().build();
     }
 
-    // Rota aninhada: lista os veículos da concessionária dealerId. 404 se o dealerId não
-    // existir (VehicleService.listarPorDealer valida antes de consultar os veículos).
     @GetMapping("/{dealerId}/vehicles")
     public ResponseEntity<List<VehicleResponseDTO>> listarVeiculos(@PathVariable Long dealerId) {
         return ResponseEntity.ok(vehicleService.listarPorDealer(dealerId));

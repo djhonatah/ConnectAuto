@@ -22,10 +22,9 @@ import com.acc.connectauto.service.VehicleService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-/**
- * Endpoints REST de veículos. Expõe apenas {@link VehicleService} e DTOs.
- */
+@Slf4j
 @RestController
 @RequestMapping("/vehicles")
 @RequiredArgsConstructor
@@ -45,6 +44,8 @@ public class VehicleController {
 
     @PostMapping
     public ResponseEntity<VehicleResponseDTO> criar(@Valid @RequestBody VehicleRequestDTO vehicleRequestDTO) {
+        log.info("POST /vehicles - criando veículo: marca={}, modelo={}", vehicleRequestDTO.marca(),
+                vehicleRequestDTO.modelo());
         VehicleResponseDTO vehicleResponseDTO = vehicleService.criar(vehicleRequestDTO);
 
         URI vehicleUri = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -59,20 +60,24 @@ public class VehicleController {
     public ResponseEntity<VehicleResponseDTO> atualizar(
             @PathVariable Long vehicleId,
             @Valid @RequestBody VehicleRequestDTO vehicleRequestDTO) {
+        log.info("PUT /vehicles/{} - atualizando veículo", vehicleId);
         return ResponseEntity.ok(vehicleService.atualizar(vehicleId, vehicleRequestDTO));
     }
 
     @DeleteMapping("/{vehicleId}")
     public ResponseEntity<Void> excluir(@PathVariable Long vehicleId) {
+        log.info("DELETE /vehicles/{} - excluindo veículo", vehicleId);
         vehicleService.excluir(vehicleId);
         return ResponseEntity.noContent().build();
     }
 
-    // PATCH em vez de PUT: altera só a associação com o Dealer, não o veículo inteiro.
+    // PATCH em vez de PUT: altera só a associação com o Dealer, não o veículo
+    // inteiro.
     @PatchMapping("/{vehicleId}/dealer")
     public ResponseEntity<VehicleResponseDTO> associarDealer(
             @PathVariable Long vehicleId,
             @RequestBody VehicleDealerRequestDTO vehicleDealerRequestDTO) {
+        log.info("PATCH /vehicles/{}/dealer - associando dealerId={}", vehicleId, vehicleDealerRequestDTO.dealerId());
         return ResponseEntity.ok(vehicleService.associarDealer(vehicleId, vehicleDealerRequestDTO));
     }
 }

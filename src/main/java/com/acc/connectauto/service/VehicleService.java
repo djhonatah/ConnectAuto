@@ -16,7 +16,9 @@ import com.acc.connectauto.repository.DealerRepository;
 import com.acc.connectauto.repository.VehicleRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VehicleService {
@@ -30,6 +32,7 @@ public class VehicleService {
         Vehicle vehicle = vehicleMapper.toEntity(vehicleRequestDTO);
         vehicle.setDealer(buscarDealerOpcional(vehicleRequestDTO.dealerId()));
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
+        log.info("Veículo criado: id={}, chassi={}", savedVehicle.getId(), savedVehicle.getChassi());
         return vehicleMapper.toDTO(savedVehicle);
     }
 
@@ -51,6 +54,7 @@ public class VehicleService {
         vehicleMapper.updateEntityFromDto(vehicleRequestDTO, vehicle);
         vehicle.setDealer(buscarDealerOpcional(vehicleRequestDTO.dealerId()));
         Vehicle updatedVehicle = vehicleRepository.save(vehicle);
+        log.info("Veículo atualizado: id={}", updatedVehicle.getId());
         return vehicleMapper.toDTO(updatedVehicle);
     }
 
@@ -58,13 +62,15 @@ public class VehicleService {
     public void excluir(Long vehicleId) {
         Vehicle vehicle = buscarEntidadePorId(vehicleId);
         vehicleRepository.delete(vehicle);
+        log.info("Veículo excluído: id={}", vehicleId);
     }
-.
+
     @Transactional
     public VehicleResponseDTO associarDealer(Long vehicleId, VehicleDealerRequestDTO vehicleDealerRequestDTO) {
         Vehicle vehicle = buscarEntidadePorId(vehicleId);
         vehicle.setDealer(buscarDealerOpcional(vehicleDealerRequestDTO.dealerId()));
         Vehicle updatedVehicle = vehicleRepository.save(vehicle);
+        log.info("Veículo {} associado à concessionária: dealerId={}", vehicleId, vehicleDealerRequestDTO.dealerId());
         return vehicleMapper.toDTO(updatedVehicle);
     }
 
