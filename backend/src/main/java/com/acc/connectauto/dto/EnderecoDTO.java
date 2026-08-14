@@ -4,6 +4,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+// Usado tanto como request (DealerRequestDTO.endereco) quanto como response
+// (DealerResponseDTO.endereco). Em POST/PUT /dealer, DealerService.resolverEnderecoOficial
+// sobrescreve logradouro/bairro/cidade/estado com o retorno oficial do ViaCEP — só o cep
+// digitado é preservado. Os valores enviados nesses 4 campos são validados (@NotBlank),
+// mas não persistidos como enviados; o response reflete o endereço oficial resolvido.
 public record EnderecoDTO(
 
         @NotBlank(message = "logradouro é obrigatório")

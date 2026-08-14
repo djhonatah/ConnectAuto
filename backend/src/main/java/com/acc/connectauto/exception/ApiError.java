@@ -11,7 +11,7 @@ public record ApiError(
         List<String> details) {
 
     public ApiError(int status, String error, String message) {
-        this(Instant.now(), status, error, message, List.of());
+        this(status, error, message, List.of());
     }
 
     public ApiError(int status, String error, String message, List<String> details) {

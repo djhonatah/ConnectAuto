@@ -48,7 +48,7 @@ public class Vehicle {
 
     private Integer ano;
 
-    @Column(length = 17)
+    @Column(length = 17, unique = true)
     private String chassi;
 
     @Column(precision = 12, scale = 2)

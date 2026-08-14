@@ -30,8 +30,7 @@ public class VehicleService {
     @Transactional
     public VehicleResponseDTO criar(VehicleRequestDTO vehicleRequestDTO) {
         Vehicle vehicle = vehicleMapper.toEntity(vehicleRequestDTO);
-        vehicle.setDealer(buscarDealerOpcional(vehicleRequestDTO.dealerId()));
-        Vehicle savedVehicle = vehicleRepository.save(vehicle);
+        Vehicle savedVehicle = salvarComDealer(vehicle, vehicleRequestDTO.dealerId());
         log.info("Veículo criado: id={}, chassi={}", savedVehicle.getId(), savedVehicle.getChassi());
         return vehicleMapper.toDTO(savedVehicle);
     }
@@ -52,8 +51,7 @@ public class VehicleService {
     public VehicleResponseDTO atualizar(Long vehicleId, VehicleRequestDTO vehicleRequestDTO) {
         Vehicle vehicle = buscarEntidadePorId(vehicleId);
         vehicleMapper.updateEntityFromDto(vehicleRequestDTO, vehicle);
-        vehicle.setDealer(buscarDealerOpcional(vehicleRequestDTO.dealerId()));
-        Vehicle updatedVehicle = vehicleRepository.save(vehicle);
+        Vehicle updatedVehicle = salvarComDealer(vehicle, vehicleRequestDTO.dealerId());
         log.info("Veículo atualizado: id={}", updatedVehicle.getId());
         return vehicleMapper.toDTO(updatedVehicle);
     }
@@ -68,32 +66,37 @@ public class VehicleService {
     @Transactional
     public VehicleResponseDTO associarDealer(Long vehicleId, VehicleDealerRequestDTO vehicleDealerRequestDTO) {
         Vehicle vehicle = buscarEntidadePorId(vehicleId);
-        vehicle.setDealer(buscarDealerOpcional(vehicleDealerRequestDTO.dealerId()));
-        Vehicle updatedVehicle = vehicleRepository.save(vehicle);
+        Vehicle updatedVehicle = salvarComDealer(vehicle, vehicleDealerRequestDTO.dealerId());
         log.info("Veículo {} associado à concessionária: dealerId={}", vehicleId, vehicleDealerRequestDTO.dealerId());
         return vehicleMapper.toDTO(updatedVehicle);
     }
 
     @Transactional(readOnly = true)
     public List<VehicleResponseDTO> listarPorDealer(Long dealerId) {
-        if (!dealerRepository.existsById(dealerId)) {
+        List<Vehicle> vehicles = vehicleRepository.findByDealer_Id(dealerId);
+        if (vehicles.isEmpty() && !dealerRepository.existsById(dealerId)) {
             throw new ResourceNotFoundException("Concessionária não encontrada com id " + dealerId);
         }
-        return vehicleRepository.findByDealer_Id(dealerId).stream()
+        return vehicles.stream()
                 .map(vehicleMapper::toDTO)
                 .toList();
     }
 
+    private Vehicle salvarComDealer(Vehicle vehicle, Long dealerId) {
+        vehicle.setDealer(buscarDealerOpcional(dealerId));
+        return vehicleRepository.save(vehicle);
+    }
+
     private Vehicle buscarEntidadePorId(Long vehicleId) {
-        return vehicleRepository.findById(vehicleId)
-                .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado com id " + vehicleId));
+        return EntityFinder.buscarOuLancar(vehicleRepository, vehicleId,
+                () -> "Veículo não encontrado com id " + vehicleId);
     }
 
     private Dealer buscarDealerOpcional(Long dealerId) {
         if (dealerId == null) {
             return null;
         }
-        return dealerRepository.findById(dealerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Concessionária não encontrada com id " + dealerId));
+        return EntityFinder.buscarOuLancar(dealerRepository, dealerId,
+                () -> "Concessionária não encontrada com id " + dealerId);
     }
 }

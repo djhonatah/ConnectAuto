@@ -13,7 +13,7 @@ public record ViaCepResponseDTO(
         String localidade,
         String uf,
         // Presente e "true" somente quando o CEP não existe; ausente (null) em respostas
-        // válidas. Ver issue #16, item "tratar CEP inválido/inexistente" (ainda não feito).
+        // válidas. Ver DealerService.consultarViaCep, que trata os dois casos.
         Boolean erro
 ) {
 }
