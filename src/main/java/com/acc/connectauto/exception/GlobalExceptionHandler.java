@@ -10,6 +10,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -60,5 +63,19 @@ public class GlobalExceptionHandler {
 
     private String formatFieldError(FieldError fieldError) {
         return "%s: %s".formatted(fieldError.getField(), fieldError.getDefaultMessage());
+    }
+
+    // Catch-all: qualquer exceção não mapeada pelos handlers acima. A stack trace e a
+    // mensagem original vão só pro log do servidor — o cliente recebe uma mensagem
+    // genérica, nunca detalhes internos da aplicação.
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleUnexpected(Exception exception) {
+        log.error("Erro inesperado não tratado", exception);
+
+        ApiError apiError = new ApiError(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                "Ocorreu um erro inesperado. Tente novamente mais tarde.");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiError);
     }
 }
