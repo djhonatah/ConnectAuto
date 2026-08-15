@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useCepLookup } from '../hooks/useCepLookup';
 import './DealerForm.css';
 
 const UFS = [
@@ -80,6 +82,8 @@ export function DealerForm({ defaultValues, onSubmit, submitLabel = 'Salvar' }: 
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<DealerFormValues>({
     resolver: zodResolver(dealerFormSchema),
@@ -90,6 +94,17 @@ export function DealerForm({ defaultValues, onSubmit, submitLabel = 'Salvar' }: 
       ...defaultValues,
     },
   });
+
+  const cepDigits = watch('endereco.cep').replace(/\D/g, '');
+  const cepLookup = useCepLookup(cepDigits);
+
+  useEffect(() => {
+    if (!cepLookup.data || cepLookup.data.erro) return;
+    setValue('endereco.logradouro', cepLookup.data.logradouro, { shouldValidate: true });
+    setValue('endereco.bairro', cepLookup.data.bairro, { shouldValidate: true });
+    setValue('endereco.cidade', cepLookup.data.localidade, { shouldValidate: true });
+    setValue('endereco.estado', cepLookup.data.uf, { shouldValidate: true });
+  }, [cepLookup.data, setValue]);
 
   return (
     <form className="dealer-form" onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -134,9 +149,13 @@ export function DealerForm({ defaultValues, onSubmit, submitLabel = 'Salvar' }: 
             {...register('endereco.cep')}
             aria-invalid={!!errors.endereco?.cep}
           />
-          {errors.endereco?.cep && (
+          {errors.endereco?.cep ? (
             <span className="dealer-form__error">{errors.endereco.cep.message}</span>
-          )}
+          ) : cepLookup.isFetching ? (
+            <span className="dealer-form__hint">Buscando endereço…</span>
+          ) : cepLookup.data?.erro ? (
+            <span className="dealer-form__error">CEP não encontrado</span>
+          ) : null}
         </div>
 
         <div className="dealer-form__field dealer-form__field--full">
