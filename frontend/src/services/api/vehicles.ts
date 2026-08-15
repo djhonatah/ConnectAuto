@@ -24,7 +24,25 @@ export interface Vehicle {
   dealerId: number | null;
 }
 
+// Formato aceito por POST /vehicles e PUT /vehicles/{id} — espelha
+// VehicleRequestDTO no backend. Não importa nada de components/VehicleForm
+// (services/api não conhece React/formulário); VehicleFormValues só precisa
+// ter esse mesmo formato, o que o TypeScript já garante estruturalmente.
+export interface VehicleInput {
+  marca: string;
+  modelo: string;
+  tipoCombustivel: FuelType;
+  cor: string;
+  ano?: number;
+  chassi?: string;
+  valor?: number;
+  corInterna?: string;
+}
+
 export const vehiclesApi = {
   listar: () => httpClient.get<Vehicle[]>('/vehicles'),
   buscarPorId: (vehicleId: number) => httpClient.get<Vehicle>(`/vehicles/${vehicleId}`),
+  criar: (data: VehicleInput) => httpClient.post<Vehicle>('/vehicles', data),
+  atualizar: (vehicleId: number, data: VehicleInput) =>
+    httpClient.put<Vehicle>(`/vehicles/${vehicleId}`, data),
 };

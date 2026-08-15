@@ -35,6 +35,41 @@
   text-decoration: underline;
 }
 
+.vehicles-page__success {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 10px 16px;
+  border: 1px solid var(--success);
+  background: var(--success-bg);
+  color: var(--success);
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.vehicles-page__success-dismiss {
+  border: none;
+  background: none;
+  color: inherit;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.vehicles-page__edit-link {
+  font-size: 14px;
+  color: var(--accent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.vehicles-page__edit-link:hover {
+  text-decoration: underline;
+}
+
 .vehicles-page__table-wrap {
   overflow-x: auto;
   border: 1px solid var(--border);

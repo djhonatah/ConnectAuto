@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useVehicles } from '../hooks/useVehicles';
 import { StatusMessage } from '../components/StatusMessage';
 import { FUEL_LABELS } from '../services/api/vehicles';
@@ -11,6 +12,23 @@ const currencyFormatter = new Intl.NumberFormat('pt-BR', {
 
 export function VehiclesPage() {
   const { data: vehicles, isLoading, isError, error, refetch, isFetching } = useVehicles();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const [successMessage, setSuccessMessage] = useState<string | null>(
+    (location.state as { successMessage?: string } | null)?.successMessage ?? null,
+  );
+
+  useEffect(() => {
+    // O "if" protege contra reexecução: depois do primeiro navigate() aqui
+    // embaixo, location.state vira null, então esse bloco não roda de novo
+    // mesmo que o efeito seja reavaliado.
+    if (location.state) {
+      // Limpa o state da navegação para o aviso não reaparecer se o usuário
+      // atualizar a página ou voltar por aqui de novo.
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.state, location.pathname, navigate]);
 
   if (isLoading) {
     return <StatusMessage kind="loading">Carregando veículos…</StatusMessage>;
@@ -47,6 +65,20 @@ export function VehiclesPage() {
         </div>
       </header>
 
+      {successMessage && (
+        <p className="vehicles-page__success" role="status">
+          {successMessage}
+          <button
+            type="button"
+            className="vehicles-page__success-dismiss"
+            aria-label="Fechar aviso"
+            onClick={() => setSuccessMessage(null)}
+          >
+            ×
+          </button>
+        </p>
+      )}
+
       {vehicles?.length ? (
         <div className="vehicles-page__table-wrap">
           <table className="vehicles-page__table">
@@ -58,6 +90,7 @@ export function VehiclesPage() {
                 <th>Combustível</th>
                 <th>Chassi</th>
                 <th>Valor</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -71,6 +104,14 @@ export function VehiclesPage() {
                   <td>{FUEL_LABELS[vehicle.tipoCombustivel]}</td>
                   <td className="vehicles-page__chassi">{vehicle.chassi}</td>
                   <td>{currencyFormatter.format(vehicle.valor)}</td>
+                  <td>
+                    <Link
+                      to={`/veiculos/${vehicle.id}/editar`}
+                      className="vehicles-page__edit-link"
+                    >
+                      Editar
+                    </Link>
+                  </td>
                 </tr>
               ))}
             </tbody>

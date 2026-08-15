@@ -9,6 +9,8 @@
   --accent-border: rgba(170, 59, 255, 0.5);
   --social-bg: rgba(244, 243, 236, 0.5);
   --danger: #c0392b;
+  --success: #1e8e5a;
+  --success-bg: rgba(30, 142, 90, 0.1);
   --shadow: rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
@@ -42,6 +44,8 @@
     --accent-border: rgba(192, 132, 252, 0.5);
     --social-bg: rgba(47, 48, 58, 0.5);
     --danger: #f47066;
+    --success: #4ade95;
+    --success-bg: rgba(74, 222, 149, 0.12);
     --shadow: rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
   }
 
@@ -75,6 +79,7 @@ h2 {
 
 h1 {
   font-size: 56px;
+  line-height: 110%;
   letter-spacing: -1.68px;
   margin: 32px 0;
   @media (max-width: 1024px) {
