@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useVehicles } from '../hooks/useVehicles';
+import { useDeleteVehicle } from '../hooks/useDeleteVehicle';
 import { StatusMessage } from '../components/StatusMessage';
-import { FUEL_LABELS } from '../services/api/vehicles';
+import { ConfirmDialog } from '../components/ConfirmDialog';
+import { FUEL_LABELS, type Vehicle } from '../services/api/vehicles';
 import './VehiclesPage.css';
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
@@ -12,12 +14,15 @@ const currencyFormatter = new Intl.NumberFormat('pt-BR', {
 
 export function VehiclesPage() {
   const { data: vehicles, isLoading, isError, error, refetch, isFetching } = useVehicles();
+  const deleteVehicle = useDeleteVehicle();
   const location = useLocation();
   const navigate = useNavigate();
 
   const [successMessage, setSuccessMessage] = useState<string | null>(
     (location.state as { successMessage?: string } | null)?.successMessage ?? null,
   );
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | null>(null);
+  const [vehicleToDelete, setVehicleToDelete] = useState<Vehicle | null>(null);
 
   useEffect(() => {
     // O "if" protege contra reexecução: depois do primeiro navigate() aqui
@@ -29,6 +34,24 @@ export function VehiclesPage() {
       navigate(location.pathname, { replace: true, state: null });
     }
   }, [location.state, location.pathname, navigate]);
+
+  function askDelete(vehicle: Vehicle) {
+    setDeleteErrorMessage(null);
+    setVehicleToDelete(vehicle);
+  }
+
+  async function confirmDelete() {
+    if (!vehicleToDelete) return;
+    try {
+      await deleteVehicle.mutateAsync(vehicleToDelete.id);
+      setSuccessMessage(`${vehicleToDelete.marca} ${vehicleToDelete.modelo} excluído com sucesso.`);
+      setVehicleToDelete(null);
+    } catch (err) {
+      setDeleteErrorMessage(
+        err instanceof Error ? err.message : 'Não foi possível excluir o veículo.',
+      );
+    }
+  }
 
   if (isLoading) {
     return <StatusMessage kind="loading">Carregando veículos…</StatusMessage>;
@@ -79,6 +102,20 @@ export function VehiclesPage() {
         </p>
       )}
 
+      {deleteErrorMessage && (
+        <p className="vehicles-page__error" role="alert">
+          {deleteErrorMessage}
+          <button
+            type="button"
+            className="vehicles-page__success-dismiss"
+            aria-label="Fechar aviso"
+            onClick={() => setDeleteErrorMessage(null)}
+          >
+            ×
+          </button>
+        </p>
+      )}
+
       {vehicles?.length ? (
         <div className="vehicles-page__table-wrap">
           <table className="vehicles-page__table">
@@ -104,13 +141,20 @@ export function VehiclesPage() {
                   <td>{FUEL_LABELS[vehicle.tipoCombustivel]}</td>
                   <td className="vehicles-page__chassi">{vehicle.chassi}</td>
                   <td>{currencyFormatter.format(vehicle.valor)}</td>
-                  <td>
+                  <td className="vehicles-page__row-actions">
                     <Link
                       to={`/veiculos/${vehicle.id}/editar`}
                       className="vehicles-page__edit-link"
                     >
                       Editar
                     </Link>
+                    <button
+                      type="button"
+                      className="vehicles-page__delete-link"
+                      onClick={() => askDelete(vehicle)}
+                    >
+                      Excluir
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -120,6 +164,20 @@ export function VehiclesPage() {
       ) : (
         <p>Nenhum veículo cadastrado.</p>
       )}
+
+      <ConfirmDialog
+        open={vehicleToDelete !== null}
+        title="Excluir veículo?"
+        description={
+          vehicleToDelete
+            ? `Isso vai remover ${vehicleToDelete.marca} ${vehicleToDelete.modelo} (${vehicleToDelete.chassi || 'sem chassi'}) permanentemente. Essa ação não pode ser desfeita.`
+            : undefined
+        }
+        confirmLabel="Excluir"
+        isConfirming={deleteVehicle.isPending}
+        onConfirm={confirmDelete}
+        onCancel={() => setVehicleToDelete(null)}
+      />
     </section>
   );
 }
