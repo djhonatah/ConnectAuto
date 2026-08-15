@@ -1,0 +1,22 @@
+.not-found-page {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 40px 0;
+}
+
+.not-found-page__plate {
+  font-size: 15px;
+  padding: 5px 14px 5px 18px;
+}
+
+.not-found-page p {
+  color: var(--ink-soft);
+  font-size: 15px;
+  max-width: 46ch;
+}
+
+.not-found-page .btn {
+  margin-top: 8px;
+}

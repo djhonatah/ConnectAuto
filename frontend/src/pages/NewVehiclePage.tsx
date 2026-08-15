@@ -21,7 +21,9 @@ export function NewVehiclePage() {
     <section className="new-vehicle-page">
       <header className="new-vehicle-page__header">
         <h1>Novo veículo</h1>
-        <Link to="/veiculos">← Voltar para a listagem</Link>
+        <Link to="/veiculos" className="new-vehicle-page__back">
+          ← Voltar para a listagem
+        </Link>
       </header>
 
       {createVehicle.isError && (

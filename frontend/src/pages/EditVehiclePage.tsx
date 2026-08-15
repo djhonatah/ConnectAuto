@@ -35,7 +35,7 @@ export function EditVehiclePage() {
       <StatusMessage
         kind="error"
         action={
-          <button type="button" className="status-message__retry" onClick={() => refetch()}>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={() => refetch()}>
             Tentar novamente
           </button>
         }
@@ -54,7 +54,9 @@ export function EditVehiclePage() {
             {vehicle.marca} {vehicle.modelo}
           </p>
         </div>
-        <Link to="/veiculos">← Voltar para a listagem</Link>
+        <Link to="/veiculos" className="new-vehicle-page__back">
+          ← Voltar para a listagem
+        </Link>
       </header>
 
       {updateVehicle.isError && (

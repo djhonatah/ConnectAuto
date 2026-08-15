@@ -52,20 +52,10 @@ export function ConfirmDialog({
       <h2>{title}</h2>
       {description && <p>{description}</p>}
       <div className="confirm-dialog__actions">
-        <button
-          type="button"
-          className="confirm-dialog__cancel"
-          onClick={onCancel}
-          disabled={isConfirming}
-        >
+        <button type="button" className="btn btn-ghost" onClick={onCancel} disabled={isConfirming}>
           {cancelLabel}
         </button>
-        <button
-          type="button"
-          className="confirm-dialog__confirm"
-          onClick={onConfirm}
-          disabled={isConfirming}
-        >
+        <button type="button" className="btn btn-danger" onClick={onConfirm} disabled={isConfirming}>
           {isConfirming ? 'Excluindo…' : confirmLabel}
         </button>
       </div>

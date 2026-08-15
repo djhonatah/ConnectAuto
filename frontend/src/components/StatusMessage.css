@@ -2,12 +2,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 32px;
+  gap: 14px;
+  padding: 56px 32px;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 14.5px;
 }
 
 .status-message--error p {
-  color: var(--danger);
+  color: var(--danger-strong);
 }
 
 .status-message__spinner {
@@ -16,6 +19,7 @@
   border-radius: 50%;
   border: 3px solid var(--border);
   border-top-color: var(--accent);
+  filter: drop-shadow(0 0 4px var(--accent-glow));
   animation: status-message-spin 0.7s linear infinite;
 }
 
@@ -29,19 +33,4 @@
   to {
     transform: rotate(360deg);
   }
-}
-
-.status-message__retry {
-  font: inherit;
-  font-size: 15px;
-  padding: 6px 16px;
-  border: 1px solid var(--accent-border);
-  border-radius: 6px;
-  background: var(--accent-bg);
-  color: var(--text-h);
-  cursor: pointer;
-}
-
-.status-message__retry:hover {
-  border-color: var(--accent);
 }

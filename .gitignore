@@ -16,3 +16,5 @@ Desktop.ini
 .claude/
 CLAUDE.md
 graphify-out/
+skills-lock.json
+skills.json

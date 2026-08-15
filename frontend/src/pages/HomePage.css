@@ -1,0 +1,142 @@
+.home-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.home-page__intro {
+  grid-column: 1 / -1;
+  padding-bottom: 8px;
+}
+
+.home-page__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--success);
+  margin-bottom: 14px;
+}
+
+.home-page__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 6px var(--success);
+  animation: home-page-pulse 2s ease-in-out infinite;
+}
+
+@keyframes home-page-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.home-page__intro h1 {
+  font-size: 34px;
+}
+
+.home-page__lead {
+  margin: 12px 0 0;
+  max-width: 52ch;
+  font-size: 16px;
+  color: var(--ink-soft);
+}
+
+.home-page__actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.home-page__tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 22px 22px 22px 26px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.home-page__tile::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.home-page__tile-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.home-page__stat {
+  font-family: var(--mono);
+  font-size: 40px;
+  line-height: 1.1;
+  color: var(--accent-strong);
+  text-shadow: 0 0 18px var(--accent-glow);
+}
+
+.home-page__tile-foot {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.home-page__tile--link {
+  text-decoration: none;
+  color: inherit;
+  justify-content: center;
+  transition:
+    border-color 0.15s ease,
+    transform 0.12s ease;
+}
+
+.home-page__tile--link p {
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.home-page__tile-cta {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.home-page__tile--link:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 640px) {
+  .home-page {
+    grid-template-columns: 1fr;
+  }
+
+  .home-page__actions {
+    flex-direction: column;
+  }
+
+  .home-page__actions .btn {
+    width: 100%;
+  }
+}

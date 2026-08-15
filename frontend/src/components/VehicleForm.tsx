@@ -136,7 +136,7 @@ export function VehicleForm({ defaultValues, onSubmit, submitLabel = 'Salvar' }:
       </div>
 
       <div className="vehicle-form__actions">
-        <button type="submit" disabled={isSubmitting}>
+        <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
           {isSubmitting ? 'Salvando…' : submitLabel}
         </button>
       </div>

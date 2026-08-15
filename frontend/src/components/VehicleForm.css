@@ -1,42 +1,54 @@
 .vehicle-form {
   width: 100%;
-  max-width: 640px;
-  text-align: left;
+  max-width: 680px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
 }
 
 .vehicle-form__grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px 20px;
+  gap: 18px 20px;
 }
 
 .vehicle-form__field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .vehicle-form__field label {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-h);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
 }
 
 .vehicle-form__field input,
 .vehicle-form__field select {
   font: inherit;
-  font-size: 15px;
-  padding: 8px 10px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--bg);
-  color: var(--text-h);
+  font-size: 14.5px;
+  padding: 9px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+  color: var(--ink);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.vehicle-form__field input::placeholder {
+  color: var(--ink-faint);
 }
 
 .vehicle-form__field input:focus-visible,
 .vehicle-form__field select:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .vehicle-form__field input[aria-invalid='true'],
@@ -46,37 +58,23 @@
 
 .vehicle-form__error {
   font-size: 12.5px;
-  color: var(--danger);
+  color: var(--danger-strong);
 }
 
 .vehicle-form__actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 24px;
-}
-
-.vehicle-form__actions button {
-  font: inherit;
-  font-size: 15px;
-  padding: 8px 20px;
-  border-radius: 6px;
-  border: 1px solid var(--accent-border);
-  background: var(--accent-bg);
-  color: var(--text-h);
-  cursor: pointer;
-}
-
-.vehicle-form__actions button:hover:not(:disabled) {
-  border-color: var(--accent);
-}
-
-.vehicle-form__actions button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
 }
 
 @media (max-width: 560px) {
+  .vehicle-form {
+    padding: 20px;
+  }
+
   .vehicle-form__grid {
     grid-template-columns: 1fr;
   }

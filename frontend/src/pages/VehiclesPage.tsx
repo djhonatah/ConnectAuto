@@ -62,7 +62,7 @@ export function VehiclesPage() {
       <StatusMessage
         kind="error"
         action={
-          <button type="button" className="status-message__retry" onClick={() => refetch()}>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={() => refetch()}>
             Tentar novamente
           </button>
         }
@@ -82,7 +82,7 @@ export function VehiclesPage() {
             {vehicles?.length === 1 ? 'veículo cadastrado' : 'veículos cadastrados'}
             {isFetching && ' · atualizando…'}
           </span>
-          <Link to="/veiculos/novo" className="vehicles-page__new-link">
+          <Link to="/veiculos/novo" className="btn btn-primary btn-sm">
             + Novo veículo
           </Link>
         </div>
@@ -139,8 +139,14 @@ export function VehiclesPage() {
                   <td>{vehicle.ano}</td>
                   <td>{vehicle.cor}</td>
                   <td>{FUEL_LABELS[vehicle.tipoCombustivel]}</td>
-                  <td className="vehicles-page__chassi">{vehicle.chassi}</td>
-                  <td>{currencyFormatter.format(vehicle.valor)}</td>
+                  <td>
+                    {vehicle.chassi ? (
+                      <span className="plate-chip">{vehicle.chassi}</span>
+                    ) : (
+                      <span className="plate-chip plate-chip--empty">sem chassi</span>
+                    )}
+                  </td>
+                  <td className="vehicles-page__value">{currencyFormatter.format(vehicle.valor)}</td>
                   <td className="vehicles-page__row-actions">
                     <Link
                       to={`/veiculos/${vehicle.id}/editar`}
