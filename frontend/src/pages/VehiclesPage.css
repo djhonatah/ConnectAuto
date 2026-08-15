@@ -12,9 +12,27 @@
   margin-bottom: 16px;
 }
 
+.vehicles-page__header-actions {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+}
+
 .vehicles-page__count {
   font-size: 14px;
   color: var(--text);
+}
+
+.vehicles-page__new-link {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--accent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.vehicles-page__new-link:hover {
+  text-decoration: underline;
 }
 
 .vehicles-page__table-wrap {

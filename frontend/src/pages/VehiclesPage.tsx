@@ -1,16 +1,8 @@
+import { Link } from 'react-router-dom';
 import { useVehicles } from '../hooks/useVehicles';
 import { StatusMessage } from '../components/StatusMessage';
-import type { FuelType } from '../services/api/vehicles';
+import { FUEL_LABELS } from '../services/api/vehicles';
 import './VehiclesPage.css';
-
-const FUEL_LABELS: Record<FuelType, string> = {
-  GASOLINA: 'Gasolina',
-  ETANOL: 'Etanol',
-  FLEX: 'Flex',
-  DIESEL: 'Diesel',
-  ELETRICO: 'Elétrico',
-  HIBRIDO: 'Híbrido',
-};
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -43,11 +35,16 @@ export function VehiclesPage() {
     <section className="vehicles-page">
       <header className="vehicles-page__header">
         <h1>Veículos</h1>
-        <span className="vehicles-page__count">
-          {vehicles?.length ?? 0}{' '}
-          {vehicles?.length === 1 ? 'veículo cadastrado' : 'veículos cadastrados'}
-          {isFetching && ' · atualizando…'}
-        </span>
+        <div className="vehicles-page__header-actions">
+          <span className="vehicles-page__count">
+            {vehicles?.length ?? 0}{' '}
+            {vehicles?.length === 1 ? 'veículo cadastrado' : 'veículos cadastrados'}
+            {isFetching && ' · atualizando…'}
+          </span>
+          <Link to="/veiculos/novo" className="vehicles-page__new-link">
+            + Novo veículo
+          </Link>
+        </div>
       </header>
 
       {vehicles?.length ? (
