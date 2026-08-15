@@ -146,7 +146,9 @@ export function VehiclesPage() {
                       <span className="plate-chip plate-chip--empty">sem chassi</span>
                     )}
                   </td>
-                  <td className="vehicles-page__value">{currencyFormatter.format(vehicle.valor)}</td>
+                  <td className="vehicles-page__value">
+                    {currencyFormatter.format(vehicle.valor)}
+                  </td>
                   <td className="vehicles-page__row-actions">
                     <Link
                       to={`/veiculos/${vehicle.id}/editar`}

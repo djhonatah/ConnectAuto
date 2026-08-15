@@ -12,7 +12,7 @@ Desktop.ini
 .env.*
 !.env.example
 
-### AI tooling (not part of the deliverable) ###
+### AI tooling ##
 .claude/
 CLAUDE.md
 graphify-out/

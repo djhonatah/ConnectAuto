@@ -4,6 +4,7 @@ import { HomePage } from '../pages/HomePage.tsx';
 import { VehiclesPage } from '../pages/VehiclesPage.tsx';
 import { NewVehiclePage } from '../pages/NewVehiclePage.tsx';
 import { EditVehiclePage } from '../pages/EditVehiclePage.tsx';
+import { DealersPage } from '../pages/DealersPage.tsx';
 import { SobrePage } from '../pages/SobrePage.tsx';
 import { NotFoundPage } from '../pages/NotFoundPage.tsx';
 
@@ -16,6 +17,7 @@ export const router = createBrowserRouter([
       { path: 'veiculos', element: <VehiclesPage /> },
       { path: 'veiculos/novo', element: <NewVehiclePage /> },
       { path: 'veiculos/:id/editar', element: <EditVehiclePage /> },
+      { path: 'concessionarias', element: <DealersPage /> },
       { path: 'sobre', element: <SobrePage /> },
       { path: '*', element: <NotFoundPage /> },
     ],

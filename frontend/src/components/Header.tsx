@@ -4,6 +4,7 @@ import './Header.css';
 const NAV_ITEMS = [
   { to: '/', label: 'Início', end: true },
   { to: '/veiculos', label: 'Veículos', end: false },
+  { to: '/concessionarias', label: 'Concessionárias', end: false },
   { to: '/sobre', label: 'Sobre', end: false },
 ];
 

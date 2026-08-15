@@ -55,7 +55,12 @@ export function ConfirmDialog({
         <button type="button" className="btn btn-ghost" onClick={onCancel} disabled={isConfirming}>
           {cancelLabel}
         </button>
-        <button type="button" className="btn btn-danger" onClick={onConfirm} disabled={isConfirming}>
+        <button
+          type="button"
+          className="btn btn-danger"
+          onClick={onConfirm}
+          disabled={isConfirming}
+        >
           {isConfirming ? 'Excluindo…' : confirmLabel}
         </button>
       </div>
