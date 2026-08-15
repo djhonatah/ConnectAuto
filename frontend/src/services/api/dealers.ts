@@ -16,8 +16,17 @@ export interface Dealer {
   endereco: Endereco;
 }
 
+export interface DealerInput {
+  razaoSocial: string;
+  cnpj: string;
+  endereco: Endereco;
+}
+
 export const dealersApi = {
   listar: () => httpClient.get<Dealer[]>('/dealer'),
   buscarPorId: (dealerId: number) => httpClient.get<Dealer>(`/dealer/${dealerId}`),
   listarVeiculos: (dealerId: number) => httpClient.get<Vehicle[]>(`/dealer/${dealerId}/vehicles`),
+  criar: (data: DealerInput) => httpClient.post<Dealer>('/dealer', data),
+  atualizar: (dealerId: number, data: DealerInput) =>
+    httpClient.put<Dealer>(`/dealer/${dealerId}`, data),
 };

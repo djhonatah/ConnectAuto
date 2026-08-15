@@ -1,10 +1,21 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { DealerForm, type DealerFormValues } from '../components/DealerForm';
+import { useCreateDealer } from '../hooks/useCreateDealer';
 import './VehicleFormPage.css';
 
 export function NewDealerPage() {
-  function handleSubmit(values: DealerFormValues) {
-    console.log('dealer válido:', values);
+  const navigate = useNavigate();
+  const createDealer = useCreateDealer();
+
+  async function handleSubmit(values: DealerFormValues) {
+    try {
+      await createDealer.mutateAsync(values);
+      navigate('/concessionarias', {
+        state: { successMessage: 'Concessionária cadastrada com sucesso.' },
+      });
+    } catch {
+      // Erro já fica disponível via createDealer.isError/error, exibido abaixo.
+    }
   }
 
   return (
@@ -15,6 +26,12 @@ export function NewDealerPage() {
           ← Voltar para a listagem
         </Link>
       </header>
+
+      {createDealer.isError && (
+        <p className="new-vehicle-page__error" role="alert">
+          Não foi possível cadastrar a concessionária: {createDealer.error.message}
+        </p>
+      )}
 
       <DealerForm onSubmit={handleSubmit} submitLabel="Cadastrar concessionária" />
     </section>

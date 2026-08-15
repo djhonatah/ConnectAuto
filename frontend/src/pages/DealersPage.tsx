@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDealers } from '../hooks/useDealers';
 import { StatusMessage } from '../components/StatusMessage';
 import './DealersPage.css';
@@ -11,6 +12,18 @@ function formatCnpj(cnpj: string): string {
 
 export function DealersPage() {
   const { data: dealers, isLoading, isError, error, refetch, isFetching } = useDealers();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const [successMessage, setSuccessMessage] = useState<string | null>(
+    (location.state as { successMessage?: string } | null)?.successMessage ?? null,
+  );
+
+  useEffect(() => {
+    if (location.state) {
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.state, location.pathname, navigate]);
 
   if (isLoading) {
     return <StatusMessage kind="loading">Carregando concessionárias…</StatusMessage>;
@@ -47,6 +60,20 @@ export function DealersPage() {
         </div>
       </header>
 
+      {successMessage && (
+        <p className="dealers-page__success" role="status">
+          {successMessage}
+          <button
+            type="button"
+            className="dealers-page__success-dismiss"
+            aria-label="Fechar aviso"
+            onClick={() => setSuccessMessage(null)}
+          >
+            ×
+          </button>
+        </p>
+      )}
+
       {dealers?.length ? (
         <div className="dealers-page__table-wrap">
           <table className="dealers-page__table">
@@ -56,6 +83,7 @@ export function DealersPage() {
                 <th>CNPJ</th>
                 <th>Endereço</th>
                 <th>Cidade/UF</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -72,6 +100,14 @@ export function DealersPage() {
                   </td>
                   <td>
                     {dealer.endereco.cidade}/{dealer.endereco.estado}
+                  </td>
+                  <td>
+                    <Link
+                      to={`/concessionarias/${dealer.id}/editar`}
+                      className="dealers-page__edit-link"
+                    >
+                      Editar
+                    </Link>
                   </td>
                 </tr>
               ))}
