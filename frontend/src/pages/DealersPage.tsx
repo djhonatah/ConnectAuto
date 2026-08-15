@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useDealers } from '../hooks/useDealers';
 import { StatusMessage } from '../components/StatusMessage';
 import './DealersPage.css';
@@ -34,11 +35,16 @@ export function DealersPage() {
     <section className="dealers-page">
       <header className="dealers-page__header">
         <h1>Concessionárias</h1>
-        <span className="dealers-page__count">
-          {dealers?.length ?? 0}{' '}
-          {dealers?.length === 1 ? 'concessionária cadastrada' : 'concessionárias cadastradas'}
-          {isFetching && ' · atualizando…'}
-        </span>
+        <div className="dealers-page__header-actions">
+          <span className="dealers-page__count">
+            {dealers?.length ?? 0}{' '}
+            {dealers?.length === 1 ? 'concessionária cadastrada' : 'concessionárias cadastradas'}
+            {isFetching && ' · atualizando…'}
+          </span>
+          <Link to="/concessionarias/novo" className="btn btn-primary btn-sm">
+            + Nova concessionária
+          </Link>
+        </div>
       </header>
 
       {dealers?.length ? (

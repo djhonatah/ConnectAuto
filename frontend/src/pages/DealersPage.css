@@ -11,6 +11,12 @@
   margin-bottom: 20px;
 }
 
+.dealers-page__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 .dealers-page__count {
   font-family: var(--mono);
   font-size: 13px;
