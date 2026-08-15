@@ -1,8 +1,24 @@
 import { useVehicles } from '../hooks/useVehicles';
 import { StatusMessage } from '../components/StatusMessage';
+import type { FuelType } from '../services/api/vehicles';
+import './VehiclesPage.css';
+
+const FUEL_LABELS: Record<FuelType, string> = {
+  GASOLINA: 'Gasolina',
+  ETANOL: 'Etanol',
+  FLEX: 'Flex',
+  DIESEL: 'Diesel',
+  ELETRICO: 'Elétrico',
+  HIBRIDO: 'Híbrido',
+};
+
+const currencyFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+});
 
 export function VehiclesPage() {
-  const { data: vehicles, isLoading, isError, error } = useVehicles();
+  const { data: vehicles, isLoading, isError, error, refetch, isFetching } = useVehicles();
 
   if (isLoading) {
     return <StatusMessage kind="loading">Carregando veículos…</StatusMessage>;
@@ -10,23 +26,59 @@ export function VehiclesPage() {
 
   if (isError) {
     return (
-      <StatusMessage kind="error">
+      <StatusMessage
+        kind="error"
+        action={
+          <button type="button" className="status-message__retry" onClick={() => refetch()}>
+            Tentar novamente
+          </button>
+        }
+      >
         Não foi possível carregar os veículos: {error.message}
       </StatusMessage>
     );
   }
 
   return (
-    <section>
-      <h1>Veículos</h1>
+    <section className="vehicles-page">
+      <header className="vehicles-page__header">
+        <h1>Veículos</h1>
+        <span className="vehicles-page__count">
+          {vehicles?.length ?? 0}{' '}
+          {vehicles?.length === 1 ? 'veículo cadastrado' : 'veículos cadastrados'}
+          {isFetching && ' · atualizando…'}
+        </span>
+      </header>
+
       {vehicles?.length ? (
-        <ul>
-          {vehicles.map((vehicle) => (
-            <li key={vehicle.id}>
-              {vehicle.marca} {vehicle.modelo} ({vehicle.ano})
-            </li>
-          ))}
-        </ul>
+        <div className="vehicles-page__table-wrap">
+          <table className="vehicles-page__table">
+            <thead>
+              <tr>
+                <th>Veículo</th>
+                <th>Ano</th>
+                <th>Cor</th>
+                <th>Combustível</th>
+                <th>Chassi</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              {vehicles.map((vehicle) => (
+                <tr key={vehicle.id}>
+                  <td>
+                    <strong>{vehicle.marca}</strong> {vehicle.modelo}
+                  </td>
+                  <td>{vehicle.ano}</td>
+                  <td>{vehicle.cor}</td>
+                  <td>{FUEL_LABELS[vehicle.tipoCombustivel]}</td>
+                  <td className="vehicles-page__chassi">{vehicle.chassi}</td>
+                  <td>{currencyFormatter.format(vehicle.valor)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : (
         <p>Nenhum veículo cadastrado.</p>
       )}

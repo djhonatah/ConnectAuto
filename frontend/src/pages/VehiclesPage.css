@@ -1,0 +1,54 @@
+.vehicles-page {
+  width: 100%;
+  max-width: 900px;
+  text-align: left;
+}
+
+.vehicles-page__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.vehicles-page__count {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.vehicles-page__table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.vehicles-page__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.vehicles-page__table th,
+.vehicles-page__table td {
+  padding: 10px 16px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.vehicles-page__table thead th {
+  background: var(--code-bg);
+  color: var(--text-h);
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+}
+
+.vehicles-page__table tbody tr:not(:last-child) td {
+  border-bottom: 1px solid var(--border);
+}
+
+.vehicles-page__chassi {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+}
