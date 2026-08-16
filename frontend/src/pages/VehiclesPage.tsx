@@ -30,12 +30,9 @@ export function VehiclesPage() {
   const [vehicleToDelete, setVehicleToDelete] = useState<Vehicle | null>(null);
 
   useEffect(() => {
-    // O "if" protege contra reexecução: depois do primeiro navigate() aqui
-    // embaixo, location.state vira null, então esse bloco não roda de novo
-    // mesmo que o efeito seja reavaliado.
+    // Limpa o state da navegação para o aviso não reaparecer num reload ou
+    // ao voltar por aqui de novo; o próprio state virar null evita um loop.
     if (location.state) {
-      // Limpa o state da navegação para o aviso não reaparecer se o usuário
-      // atualizar a página ou voltar por aqui de novo.
       navigate(location.pathname, { replace: true, state: null });
     }
   }, [location.state, location.pathname, navigate]);

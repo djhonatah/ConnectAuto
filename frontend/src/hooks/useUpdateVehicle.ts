@@ -8,8 +8,6 @@ export function useUpdateVehicle() {
     mutationFn: ({ id, data }: { id: number; data: VehicleInput }) =>
       vehiclesApi.atualizar(id, data),
     onSuccess: () => {
-      // Invalida tanto a listagem quanto o cache do veículo individual, para
-      // que qualquer tela que dependa desses dados busque a versão nova.
       // Também invalida ['dealers'] (que cobre ['dealers', id, 'vehicles']),
       // já que a tela de veículos de uma concessionária mostra esses dados.
       queryClient.invalidateQueries({ queryKey: ['vehicles'] });

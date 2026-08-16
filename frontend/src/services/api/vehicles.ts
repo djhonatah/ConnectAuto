@@ -25,9 +25,7 @@ export interface Vehicle {
 }
 
 // Formato aceito por POST /vehicles e PUT /vehicles/{id} — espelha
-// VehicleRequestDTO no backend. Não importa nada de components/VehicleForm
-// (services/api não conhece React/formulário); VehicleFormValues só precisa
-// ter esse mesmo formato, o que o TypeScript já garante estruturalmente.
+// VehicleRequestDTO no backend.
 export interface VehicleInput {
   marca: string;
   modelo: string;

@@ -6,14 +6,10 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * Libera o navegador a chamar a API a partir das origens do frontend
- * (ex.: http://localhost:5173 em desenvolvimento). Sem isso, o backend
- * responde normalmente a curl/Postman, mas o navegador bloqueia a
- * chamada por política de CORS.
- *
- * As origens permitidas vêm de application.properties
- * (connectauto.cors.allowed-origins), para não precisar recompilar ao
- * trocar de ambiente.
+ * Libera o navegador a chamar a API a partir das origens do frontend (ex.:
+ * http://localhost:5173): sem isso o backend responde normalmente a
+ * curl/Postman, mas o navegador bloqueia a chamada por política de CORS.
+ * Origens permitidas vêm de application.properties (connectauto.cors.allowed-origins).
  */
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {

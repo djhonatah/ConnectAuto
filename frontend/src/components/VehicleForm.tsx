@@ -7,9 +7,7 @@ import './VehicleForm.css';
 const CURRENT_YEAR = new Date().getFullYear();
 const fuelTypes = Object.keys(FUEL_LABELS) as FuelType[];
 
-// Espelha as validações de VehicleRequestDTO no backend: marca, modelo,
-// tipoCombustivel e cor são obrigatórios; ano, chassi, valor e corInterna
-// são opcionais, mas continuam validados quando preenchidos.
+// Espelha as validações de VehicleRequestDTO no backend.
 const vehicleFormSchema = z.object({
   marca: z.string().trim().min(1, 'Marca é obrigatória'),
   modelo: z.string().trim().min(1, 'Modelo é obrigatório'),
