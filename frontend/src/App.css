@@ -1,9 +1,13 @@
-.app-main {
-  flex-grow: 1;
+.app-shell {
+  display: flex;
+  min-height: 100dvh;
   width: 100%;
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 40px 32px 64px;
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  padding: 40px 40px 64px;
   text-align: left;
 }
 
