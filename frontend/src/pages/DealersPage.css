@@ -23,7 +23,8 @@
   color: var(--ink-soft);
 }
 
-.dealers-page__success {
+.dealers-page__success,
+.dealers-page__error {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -52,6 +53,16 @@
   color: var(--ink);
 }
 
+.dealers-page__error {
+  border-left-color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.dealers-page__row-actions {
+  display: flex;
+  gap: 16px;
+}
+
 .dealers-page__edit-link {
   font-size: 13.5px;
   font-weight: 500;
@@ -62,6 +73,23 @@
 
 .dealers-page__edit-link:hover {
   color: var(--accent-strong);
+  text-decoration: underline;
+}
+
+.dealers-page__delete-link {
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--danger);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.dealers-page__delete-link:hover {
+  color: var(--danger-strong);
   text-decoration: underline;
 }
 

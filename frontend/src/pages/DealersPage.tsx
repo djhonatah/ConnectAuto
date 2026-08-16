@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDealers } from '../hooks/useDealers';
+import { useDeleteDealer } from '../hooks/useDeleteDealer';
 import { StatusMessage } from '../components/StatusMessage';
+import { ConfirmDialog } from '../components/ConfirmDialog';
+import type { Dealer } from '../services/api/dealers';
 import './DealersPage.css';
 
 function formatCnpj(cnpj: string): string {
@@ -12,18 +15,39 @@ function formatCnpj(cnpj: string): string {
 
 export function DealersPage() {
   const { data: dealers, isLoading, isError, error, refetch, isFetching } = useDealers();
+  const deleteDealer = useDeleteDealer();
   const location = useLocation();
   const navigate = useNavigate();
 
   const [successMessage, setSuccessMessage] = useState<string | null>(
     (location.state as { successMessage?: string } | null)?.successMessage ?? null,
   );
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | null>(null);
+  const [dealerToDelete, setDealerToDelete] = useState<Dealer | null>(null);
 
   useEffect(() => {
     if (location.state) {
       navigate(location.pathname, { replace: true, state: null });
     }
   }, [location.state, location.pathname, navigate]);
+
+  function askDelete(dealer: Dealer) {
+    setDeleteErrorMessage(null);
+    setDealerToDelete(dealer);
+  }
+
+  async function confirmDelete() {
+    if (!dealerToDelete) return;
+    try {
+      await deleteDealer.mutateAsync(dealerToDelete.id);
+      setSuccessMessage(`${dealerToDelete.razaoSocial} excluída com sucesso.`);
+      setDealerToDelete(null);
+    } catch (err) {
+      setDeleteErrorMessage(
+        err instanceof Error ? err.message : 'Não foi possível excluir a concessionária.',
+      );
+    }
+  }
 
   if (isLoading) {
     return <StatusMessage kind="loading">Carregando concessionárias…</StatusMessage>;
@@ -74,6 +98,20 @@ export function DealersPage() {
         </p>
       )}
 
+      {deleteErrorMessage && (
+        <p className="dealers-page__error" role="alert">
+          {deleteErrorMessage}
+          <button
+            type="button"
+            className="dealers-page__success-dismiss"
+            aria-label="Fechar aviso"
+            onClick={() => setDeleteErrorMessage(null)}
+          >
+            ×
+          </button>
+        </p>
+      )}
+
       {dealers?.length ? (
         <div className="dealers-page__table-wrap">
           <table className="dealers-page__table">
@@ -101,13 +139,20 @@ export function DealersPage() {
                   <td>
                     {dealer.endereco.cidade}/{dealer.endereco.estado}
                   </td>
-                  <td>
+                  <td className="dealers-page__row-actions">
                     <Link
                       to={`/concessionarias/${dealer.id}/editar`}
                       className="dealers-page__edit-link"
                     >
                       Editar
                     </Link>
+                    <button
+                      type="button"
+                      className="dealers-page__delete-link"
+                      onClick={() => askDelete(dealer)}
+                    >
+                      Excluir
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -117,6 +162,20 @@ export function DealersPage() {
       ) : (
         <p>Nenhuma concessionária cadastrada.</p>
       )}
+
+      <ConfirmDialog
+        open={dealerToDelete !== null}
+        title="Excluir concessionária?"
+        description={
+          dealerToDelete
+            ? `Isso vai remover ${dealerToDelete.razaoSocial} (${formatCnpj(dealerToDelete.cnpj)}) permanentemente. Essa ação não pode ser desfeita.`
+            : undefined
+        }
+        confirmLabel="Excluir"
+        isConfirming={deleteDealer.isPending}
+        onConfirm={confirmDelete}
+        onCancel={() => setDealerToDelete(null)}
+      />
     </section>
   );
 }
