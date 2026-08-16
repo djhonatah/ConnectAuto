@@ -191,9 +191,7 @@ export function VehiclesPage() {
                     )}
                   </td>
                   <td className="vehicles-page__value">
-                    {vehicle.valor != null
-                      ? currencyFormatter.format(vehicle.valor)
-                      : '—'}
+                    {vehicle.valor != null ? currencyFormatter.format(vehicle.valor) : '—'}
                   </td>
                   <td>
                     <select

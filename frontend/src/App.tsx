@@ -21,7 +21,7 @@ function App() {
     <div className="app-shell">
       <Sidebar />
       <main className="app-main">
-        <Topbar query={query} onQueryChange={setQuery} />
+        <Topbar query={query} onQueryChange={setQuery} hideSearch={location.pathname === '/'} />
         <div className="app-content">
           <Outlet context={outletContext} />
         </div>

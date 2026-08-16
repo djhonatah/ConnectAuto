@@ -60,18 +60,19 @@
 .login-page__plate {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   background: linear-gradient(180deg, #f4f5f7, #dfe2e6);
-  color: #14161a;
-  font-family: var(--mono);
-  font-weight: 700;
-  font-size: 13px;
-  padding: 8px 16px;
+  padding: 8px 18px;
   border-radius: 6px;
-  letter-spacing: 2px;
   box-shadow:
     inset 0 0 0 2px rgba(20, 22, 26, 0.13),
     0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.login-page__plate-mark {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
 }
 
 .login-page__rivet {

@@ -60,7 +60,7 @@ export function LoginPage() {
         <div className="login-page__visual-copy">
           <div className="login-page__plate">
             <span className="login-page__rivet" />
-            CONNECT · AUTO
+            <BrandMark className="login-page__plate-mark" />
             <span className="login-page__rivet" />
           </div>
           <h2>Toda a frota e a rede de concessionárias, num só painel.</h2>

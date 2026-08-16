@@ -79,7 +79,7 @@ export function HomePage() {
   const electrifiedCount = vehicles.filter((v) =>
     (['ELETRICO', 'HIBRIDO'] as FuelType[]).includes(v.tipoCombustivel),
   ).length;
-  const totalValue = vehicles.reduce((sum, v) => sum + v.valor, 0);
+  const totalValue = vehicles.reduce((sum, v) => sum + (v.valor ?? 0), 0);
   const activeDealers = dealers.filter((dealer) => (countsByDealer.get(dealer.id) ?? 0) > 0).length;
 
   const topDealers = dealers
@@ -259,7 +259,7 @@ export function HomePage() {
                   </td>
                   <td>{vehicle.cor}</td>
                   <td className="dashboard__value-cell">
-                    {currencyFormatter.format(vehicle.valor)}
+                    {vehicle.valor != null ? currencyFormatter.format(vehicle.valor) : '—'}
                   </td>
                   <td>
                     <Link to={`/veiculos/${vehicle.id}/editar`} className="dashboard__row-action">

@@ -120,7 +120,7 @@ export function DealerVehiclesPage() {
                     )}
                   </td>
                   <td className="dealer-vehicles-page__value">
-                    {currencyFormatter.format(vehicle.valor)}
+                    {vehicle.valor != null ? currencyFormatter.format(vehicle.valor) : '—'}
                   </td>
                   <td>
                     <Link
