@@ -7,6 +7,54 @@ Sistema de gestão de estoque de veículos para concessionárias: cadastro de ve
 - **Backend**: Java 21, Spring Boot 4, Spring Data JPA, H2 (banco em memória)
 - **Frontend**: React 19, TypeScript, Vite, TanStack Query, React Hook Form + Zod, React Router
 
+## Arquitetura
+
+```mermaid
+flowchart LR
+  subgraph Frontend["Frontend — React + Vite (porta 5173)"]
+    UI["Pages / Components"]
+    Hooks["Hooks (TanStack Query)"]
+    Api["services/api (fetch)"]
+    UI --> Hooks --> Api
+  end
+
+  subgraph Backend["Backend — Spring Boot (porta 8080)"]
+    Controller["Controllers"]
+    Service["Services"]
+    Repo["Repositories (Spring Data JPA)"]
+    Client["ViaCepClient"]
+    Controller --> Service
+    Service --> Repo
+    Service --> Client
+  end
+
+  DB[("H2 — banco em memória")]
+  ViaCEP["ViaCEP<br/>API externa"]
+
+  Api -->|"REST/JSON via CORS"| Controller
+  Api -->|"autofill de CEP ao digitar"| ViaCEP
+  Repo --> DB
+  Client -->|"valida/enriquece endereço no submit"| ViaCEP
+```
+
+O frontend é organizado em camadas (`services/api` → `hooks` → `components`/`pages`): `services/api` faz as chamadas HTTP puras, `hooks` embrulha isso em `useQuery`/`useMutation` do TanStack Query, e componentes/páginas só consomem os hooks — nunca chamam `fetch` diretamente. O backend segue o mesmo espírito em camadas: `Controller` (HTTP) → `Service` (regra de negócio) → `Repository` (JPA/H2), com DTOs de request/response mapeados para as entidades via MapStruct.
+
+**Integração com o ViaCEP acontece dos dois lados, por motivos diferentes:**
+
+- O **frontend** chama o ViaCEP diretamente do navegador enquanto o usuário digita o CEP, para preencher logradouro/bairro/cidade/estado na hora (feedback rápido, sem depender de round-trip pelo backend).
+- O **backend** chama o ViaCEP de novo, através do `ViaCepClient`, no momento de salvar uma concessionária — o servidor nunca confia no endereço que o cliente mandou, então valida e enriquece o endereço por conta própria antes de persistir.
+
+### Principais decisões técnicas
+
+- **Arquitetura em camadas nos dois lados** (controller/service/repository no backend; api/hooks/componentes no frontend), separando I/O, regra de negócio e UI.
+- **TanStack Query** no lugar de `useState`/`useEffect` manual para dados de servidor: cache, loading/error state e invalidação após mutações já vêm prontos.
+- **Zod + React Hook Form espelhando as validações do backend** (Bean Validation nos DTOs): feedback imediato no formulário, mas o backend sempre revalida tudo — o frontend nunca é a única linha de defesa.
+- **H2 em memória**: zero setup para rodar localmente ou testar, ao custo de perder os dados a cada reinício do backend (documentado na seção [Banco H2](#banco-h2)).
+- **CORS via `WebMvcConfigurer`** com a origem permitida configurável por `connectauto.cors.allowed-origins`, em vez de Spring Security — a API não tem autenticação neste estágio, então Security adicionaria complexidade sem necessidade real.
+- **MapStruct** para mapear Entity ↔ DTO, evitando conversão manual e mantendo as entidades JPA fora dos controllers.
+- **Tratamento de erro centralizado** (`@RestControllerAdvice`): todo erro da API volta no mesmo formato (`ApiError`: timestamp/status/mensagem/detalhes), e o `httpClient` do frontend sabe extrair essa mensagem de forma genérica pra exibir ao usuário.
+- **Testes automatizados no frontend** com Vitest + Testing Library, mockando a camada `services/api` (não os hooks), cobrindo os formulários principais e as listagens.
+
 ## Pré-requisitos
 
 | Ferramenta | Versão                          |
