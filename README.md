@@ -130,6 +130,41 @@ O backend não exige nenhuma variável de ambiente para rodar localmente — a c
 
 O backend usa H2 **em memória**: os dados existem só enquanto o processo do backend está rodando e somem a cada reinício.
 
+### Modelo de dados (DER)
+
+```mermaid
+erDiagram
+    DEALER {
+        bigint id PK
+        varchar razao_social
+        varchar cnpj UK
+        varchar logradouro
+        varchar bairro
+        varchar cidade
+        varchar estado
+        varchar cep
+    }
+    VEHICLE {
+        bigint id PK
+        varchar marca
+        varchar modelo
+        varchar tipo_combustivel
+        varchar cor
+        integer ano
+        varchar chassi UK
+        decimal valor
+        varchar cor_interna
+        bigint dealer_id FK
+    }
+    DEALER |o--o{ VEHICLE : "possui"
+```
+
+Só duas tabelas de verdade — `dealer` e `vehicle` — não três: o endereço da concessionária (`Endereco`) é um `@Embeddable` do JPA, então `logradouro`/`bairro`/`cidade`/`estado`/`cep` viram colunas direto na tabela `dealer`, sem tabela nem `JOIN` separados.
+
+- `dealer.cnpj` e `vehicle.chassi` têm restrição `UNIQUE`.
+- `vehicle.dealer_id` é **opcional** (nullable): um veículo pode existir sem concessionária associada — é assim que a issue de associação veículo↔concessionária consegue desvincular um veículo (`dealerId: null`).
+- `vehicle.tipo_combustivel` guarda o enum Java (`GASOLINA`/`ETANOL`/`FLEX`/`DIESEL`/`ELETRICO`/`HIBRIDO`) como texto (`EnumType.STRING`), não como número — mais legível direto no banco e resiliente a reordenar os valores do enum no código.
+
 ### Acessar o console
 
 1. Com o backend rodando, acesse `http://localhost:8080/h2-console`
