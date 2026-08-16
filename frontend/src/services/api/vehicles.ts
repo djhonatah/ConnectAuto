@@ -45,5 +45,7 @@ export const vehiclesApi = {
   criar: (data: VehicleInput) => httpClient.post<Vehicle>('/vehicles', data),
   atualizar: (vehicleId: number, data: VehicleInput) =>
     httpClient.put<Vehicle>(`/vehicles/${vehicleId}`, data),
+  associarDealer: (vehicleId: number, dealerId: number | null) =>
+    httpClient.patch<Vehicle>(`/vehicles/${vehicleId}/dealer`, { dealerId }),
   excluir: (vehicleId: number) => httpClient.delete<void>(`/vehicles/${vehicleId}`),
 };

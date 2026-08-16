@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useVehicles } from '../hooks/useVehicles';
 import { useDeleteVehicle } from '../hooks/useDeleteVehicle';
+import { useDealers } from '../hooks/useDealers';
+import { useAssociateDealer } from '../hooks/useAssociateDealer';
 import { StatusMessage } from '../components/StatusMessage';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { FUEL_LABELS, type Vehicle } from '../services/api/vehicles';
@@ -14,7 +16,9 @@ const currencyFormatter = new Intl.NumberFormat('pt-BR', {
 
 export function VehiclesPage() {
   const { data: vehicles, isLoading, isError, error, refetch, isFetching } = useVehicles();
+  const { data: dealers } = useDealers();
   const deleteVehicle = useDeleteVehicle();
+  const associateDealer = useAssociateDealer();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -22,6 +26,7 @@ export function VehiclesPage() {
     (location.state as { successMessage?: string } | null)?.successMessage ?? null,
   );
   const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | null>(null);
+  const [associateErrorMessage, setAssociateErrorMessage] = useState<string | null>(null);
   const [vehicleToDelete, setVehicleToDelete] = useState<Vehicle | null>(null);
 
   useEffect(() => {
@@ -49,6 +54,20 @@ export function VehiclesPage() {
     } catch (err) {
       setDeleteErrorMessage(
         err instanceof Error ? err.message : 'Não foi possível excluir o veículo.',
+      );
+    }
+  }
+
+  async function handleDealerChange(vehicleId: number, value: string) {
+    setAssociateErrorMessage(null);
+    try {
+      await associateDealer.mutateAsync({
+        vehicleId,
+        dealerId: value === '' ? null : Number(value),
+      });
+    } catch (err) {
+      setAssociateErrorMessage(
+        err instanceof Error ? err.message : 'Não foi possível alterar a concessionária.',
       );
     }
   }
@@ -116,6 +135,20 @@ export function VehiclesPage() {
         </p>
       )}
 
+      {associateErrorMessage && (
+        <p className="vehicles-page__error" role="alert">
+          {associateErrorMessage}
+          <button
+            type="button"
+            className="vehicles-page__success-dismiss"
+            aria-label="Fechar aviso"
+            onClick={() => setAssociateErrorMessage(null)}
+          >
+            ×
+          </button>
+        </p>
+      )}
+
       {vehicles?.length ? (
         <div className="vehicles-page__table-wrap">
           <table className="vehicles-page__table">
@@ -127,6 +160,7 @@ export function VehiclesPage() {
                 <th>Combustível</th>
                 <th>Chassi</th>
                 <th>Valor</th>
+                <th>Concessionária</th>
                 <th></th>
               </tr>
             </thead>
@@ -148,6 +182,21 @@ export function VehiclesPage() {
                   </td>
                   <td className="vehicles-page__value">
                     {currencyFormatter.format(vehicle.valor)}
+                  </td>
+                  <td>
+                    <select
+                      className="vehicles-page__dealer-select"
+                      value={vehicle.dealerId ?? ''}
+                      disabled={associateDealer.isPending}
+                      onChange={(e) => handleDealerChange(vehicle.id, e.target.value)}
+                    >
+                      <option value="">Sem concessionária</option>
+                      {dealers?.map((dealer) => (
+                        <option key={dealer.id} value={dealer.id}>
+                          {dealer.razaoSocial}
+                        </option>
+                      ))}
+                    </select>
                   </td>
                   <td className="vehicles-page__row-actions">
                     <Link
