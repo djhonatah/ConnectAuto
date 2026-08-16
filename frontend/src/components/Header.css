@@ -20,14 +20,16 @@
 
     strong {
       font-weight: 700;
+      color: var(--accent);
     }
   }
 
   .app-header__mark {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     flex-shrink: 0;
-    filter: drop-shadow(0 0 6px var(--accent-glow));
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
   }
 
   nav {
