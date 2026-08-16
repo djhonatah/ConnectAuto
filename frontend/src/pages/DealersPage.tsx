@@ -57,6 +57,7 @@ export function DealersPage() {
       setSuccessMessage(`${dealerToDelete.razaoSocial} excluída com sucesso.`);
       setDealerToDelete(null);
     } catch (err) {
+      setDealerToDelete(null);
       setDeleteErrorMessage(
         err instanceof Error ? err.message : 'Não foi possível excluir a concessionária.',
       );

@@ -8,6 +8,7 @@ export function useCreateVehicle() {
     mutationFn: (data: VehicleInput) => vehiclesApi.criar(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vehicles'] });
+      queryClient.invalidateQueries({ queryKey: ['dealers'] });
     },
   });
 }

@@ -19,7 +19,7 @@ export interface Vehicle {
   cor: string;
   ano: number;
   chassi: string;
-  valor: number;
+  valor: number | null;
   corInterna: string;
   dealerId: number | null;
 }

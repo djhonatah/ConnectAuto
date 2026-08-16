@@ -13,7 +13,6 @@ import com.acc.connectauto.dto.ViaCepResponseDTO;
 import com.acc.connectauto.dto.request.DealerRequestDTO;
 import com.acc.connectauto.dto.response.DealerResponseDTO;
 import com.acc.connectauto.entity.Dealer;
-import com.acc.connectauto.entity.Endereco;
 import com.acc.connectauto.exception.CepIndisponivelException;
 import com.acc.connectauto.exception.CepInvalidoException;
 import com.acc.connectauto.exception.DealerComVeiculosAssociadosException;
@@ -66,7 +65,7 @@ public class DealerService {
         Dealer dealer = buscarEntidadePorId(dealerId);
 
         EnderecoDTO enderecoOficialDTO = cepPermaneceuOMesmo(dealerRequestDTO, dealer)
-                ? enderecoAtualDoDealer(dealer)
+                ? dealerRequestDTO.endereco()
                 : resolverEnderecoOficial(dealerRequestDTO.endereco());
 
         dealerMapper.updateEntityFromDto(comEndereco(dealerRequestDTO, enderecoOficialDTO), dealer);
@@ -99,16 +98,6 @@ public class DealerService {
         return dealerRequestDTO.endereco().cep().equals(dealer.getEndereco().getCep());
     }
 
-    private EnderecoDTO enderecoAtualDoDealer(Dealer dealer) {
-        Endereco enderecoAtual = dealer.getEndereco();
-        return new EnderecoDTO(
-                enderecoAtual.getLogradouro(),
-                enderecoAtual.getBairro(),
-                enderecoAtual.getCidade(),
-                enderecoAtual.getEstado(),
-                enderecoAtual.getCep());
-    }
-
     private DealerRequestDTO comEndereco(DealerRequestDTO dealerRequestDTO, EnderecoDTO enderecoDTO) {
         return new DealerRequestDTO(dealerRequestDTO.razaoSocial(), dealerRequestDTO.cnpj(), enderecoDTO);
     }
@@ -129,10 +118,16 @@ public class DealerService {
         String bairro = viaCepResponseDTO.bairro() != null
                 ? viaCepResponseDTO.bairro()
                 : enderecoOriginalDTO.bairro();
+        String localidade = viaCepResponseDTO.localidade() != null
+                ? viaCepResponseDTO.localidade()
+                : enderecoOriginalDTO.cidade();
+        String uf = viaCepResponseDTO.uf() != null
+                ? viaCepResponseDTO.uf()
+                : enderecoOriginalDTO.estado();
 
         return new ViaCepResponseDTO(
                 viaCepResponseDTO.cep(), logradouro, bairro,
-                viaCepResponseDTO.localidade(), viaCepResponseDTO.uf(), viaCepResponseDTO.erro());
+                localidade, uf, viaCepResponseDTO.erro());
     }
 
     private ViaCepResponseDTO consultarViaCep(String cep) {

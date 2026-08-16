@@ -60,6 +60,7 @@ export function VehiclesPage() {
       setSuccessMessage(`${vehicleToDelete.marca} ${vehicleToDelete.modelo} excluído com sucesso.`);
       setVehicleToDelete(null);
     } catch (err) {
+      setVehicleToDelete(null);
       setDeleteErrorMessage(
         err instanceof Error ? err.message : 'Não foi possível excluir o veículo.',
       );
@@ -190,7 +191,9 @@ export function VehiclesPage() {
                     )}
                   </td>
                   <td className="vehicles-page__value">
-                    {currencyFormatter.format(vehicle.valor)}
+                    {vehicle.valor != null
+                      ? currencyFormatter.format(vehicle.valor)
+                      : '—'}
                   </td>
                   <td>
                     <select

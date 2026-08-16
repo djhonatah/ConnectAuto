@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -82,9 +82,13 @@ export function VehicleForm({ defaultValues, onSubmit, submitLabel = 'Salvar' }:
   // As opções da concessionária chegam de forma assíncrona (useDealers) — se
   // a lista ainda não tinha carregado quando o <select> montou, o valor
   // inicial não "gruda" em nenhuma <option> (nenhuma existia ainda). Assim
-  // que a lista chega, força a seleção pro dealerId que veio em defaultValues.
+  // que a lista chega pela primeira vez, força a seleção pro dealerId que
+  // veio em defaultValues. O ref evita que um refetch em segundo plano
+  // sobrescreva a escolha do usuário.
+  const dealerSyncedRef = useRef(false);
   useEffect(() => {
-    if (dealers && defaultValues?.dealerId !== undefined) {
+    if (dealers && defaultValues?.dealerId !== undefined && !dealerSyncedRef.current) {
+      dealerSyncedRef.current = true;
       setValue('dealerId', defaultValues.dealerId);
     }
   }, [dealers, defaultValues?.dealerId, setValue]);
