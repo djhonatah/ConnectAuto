@@ -29,4 +29,5 @@ export const dealersApi = {
   criar: (data: DealerInput) => httpClient.post<Dealer>('/dealer', data),
   atualizar: (dealerId: number, data: DealerInput) =>
     httpClient.put<Dealer>(`/dealer/${dealerId}`, data),
+  excluir: (dealerId: number) => httpClient.delete<void>(`/dealer/${dealerId}`),
 };
