@@ -29,7 +29,9 @@ export function HomePage() {
 
       <div className="home-page__tile home-page__tile--stat">
         <span className="home-page__tile-label">Veículos cadastrados</span>
-        <strong className="home-page__stat">{isLoading ? '···' : total}</strong>
+        <strong className="home-page__stat">
+          {isLoading ? <span className="home-page__stat-spinner" aria-hidden="true" /> : total}
+        </strong>
         <span className="home-page__tile-foot">no estoque atual</span>
       </div>
 

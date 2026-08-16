@@ -21,7 +21,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
-    throw new ApiError(response.status, `Erro ${response.status} ao chamar ${path}`);
+    throw new ApiError(response.status, await extractErrorMessage(response, path));
   }
 
   if (response.status === 204) {
@@ -29,6 +29,17 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   }
 
   return (await response.json()) as T;
+}
+
+async function extractErrorMessage(response: Response, path: string): Promise<string> {
+  try {
+    const body = (await response.json()) as { message?: string; details?: string[] };
+    if (body.details?.length) return body.details.join('; ');
+    if (body.message) return body.message;
+  } catch {
+    /* corpo não é JSON, cai na mensagem genérica abaixo */
+  }
+  return `Erro ${response.status} ao chamar ${path}`;
 }
 
 export const httpClient = {

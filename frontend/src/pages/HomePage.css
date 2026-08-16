@@ -96,6 +96,29 @@
   text-shadow: 0 0 18px var(--accent-glow);
 }
 
+.home-page__stat-spinner {
+  display: inline-block;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  filter: drop-shadow(0 0 4px var(--accent-glow));
+  animation: home-page-spin 0.7s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-page__stat-spinner {
+    animation: none;
+  }
+}
+
+@keyframes home-page-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .home-page__tile-foot {
   font-size: 13px;
   color: var(--ink-soft);
