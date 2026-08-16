@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../../config/env';
+import { getToken, SESSION_EXPIRED_EVENT } from '../auth/session';
 
 export class ApiError extends Error {
   readonly status: number;
@@ -12,15 +13,26 @@ export class ApiError extends Error {
 
 /**
  * Wrapper fino sobre fetch: resolve a URL contra API_BASE_URL, define
- * headers JSON por padrão e lança ApiError em respostas não-2xx.
+ * headers JSON por padrão (mais o token de sessão, se houver) e lança
+ * ApiError em respostas não-2xx.
  */
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const token = getToken();
   const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...init?.headers },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...init?.headers,
+    },
     ...init,
   });
 
   if (!response.ok) {
+    // 401 com token anexado = sessão expirou/invalidou no servidor (não um
+    // simples login errado, que não tem token). Avisa a aplicação reagir.
+    if (response.status === 401 && token) {
+      window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
+    }
     throw new ApiError(response.status, await extractErrorMessage(response, path));
   }
 

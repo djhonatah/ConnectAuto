@@ -1,5 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import App from '../App.tsx';
+import { RequireAuth } from '../components/RequireAuth.tsx';
+import { LoginPage } from '../pages/LoginPage.tsx';
 import { HomePage } from '../pages/HomePage.tsx';
 import { VehiclesPage } from '../pages/VehiclesPage.tsx';
 import { NewVehiclePage } from '../pages/NewVehiclePage.tsx';
@@ -12,9 +14,14 @@ import { SobrePage } from '../pages/SobrePage.tsx';
 import { NotFoundPage } from '../pages/NotFoundPage.tsx';
 
 export const router = createBrowserRouter([
+  { path: '/login', element: <LoginPage /> },
   {
     path: '/',
-    element: <App />,
+    element: (
+      <RequireAuth>
+        <App />
+      </RequireAuth>
+    ),
     children: [
       { index: true, element: <HomePage /> },
       { path: 'veiculos', element: <VehiclesPage /> },
