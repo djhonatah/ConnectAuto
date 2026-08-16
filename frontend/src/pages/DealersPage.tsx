@@ -141,6 +141,12 @@ export function DealersPage() {
                   </td>
                   <td className="dealers-page__row-actions">
                     <Link
+                      to={`/concessionarias/${dealer.id}/veiculos`}
+                      className="dealers-page__edit-link"
+                    >
+                      Ver veículos
+                    </Link>
+                    <Link
                       to={`/concessionarias/${dealer.id}/editar`}
                       className="dealers-page__edit-link"
                     >

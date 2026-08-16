@@ -7,6 +7,7 @@ import { EditVehiclePage } from '../pages/EditVehiclePage.tsx';
 import { DealersPage } from '../pages/DealersPage.tsx';
 import { NewDealerPage } from '../pages/NewDealerPage.tsx';
 import { EditDealerPage } from '../pages/EditDealerPage.tsx';
+import { DealerVehiclesPage } from '../pages/DealerVehiclesPage.tsx';
 import { SobrePage } from '../pages/SobrePage.tsx';
 import { NotFoundPage } from '../pages/NotFoundPage.tsx';
 
@@ -22,6 +23,7 @@ export const router = createBrowserRouter([
       { path: 'concessionarias', element: <DealersPage /> },
       { path: 'concessionarias/novo', element: <NewDealerPage /> },
       { path: 'concessionarias/:id/editar', element: <EditDealerPage /> },
+      { path: 'concessionarias/:id/veiculos', element: <DealerVehiclesPage /> },
       { path: 'sobre', element: <SobrePage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
