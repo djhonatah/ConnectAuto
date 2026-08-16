@@ -41,7 +41,7 @@ import com.acc.connectauto.service.VehicleService;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @Transactional
 class VehicleControllerTest {
 

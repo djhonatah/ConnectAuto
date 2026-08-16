@@ -49,6 +49,13 @@ public class GlobalExceptionHandler {
                         + "(ex.: valor único já cadastrado ou registro ainda referenciado por outro recurso).");
     }
 
+    @ExceptionHandler(CredenciaisInvalidasException.class)
+    public ResponseEntity<ApiError> handleCredenciaisInvalidas(
+            CredenciaisInvalidasException credenciaisInvalidasException) {
+        log.warn(credenciaisInvalidasException.getMessage());
+        return respond(HttpStatus.UNAUTHORIZED, credenciaisInvalidasException.getMessage());
+    }
+
     @ExceptionHandler(DealerComVeiculosAssociadosException.class)
     public ResponseEntity<ApiError> handleDealerComVeiculosAssociados(
             DealerComVeiculosAssociadosException dealerComVeiculosAssociadosException) {

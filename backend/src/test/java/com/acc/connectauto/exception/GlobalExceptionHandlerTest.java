@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.acc.connectauto.service.VehicleService;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 class GlobalExceptionHandlerTest {
 
     @Autowired

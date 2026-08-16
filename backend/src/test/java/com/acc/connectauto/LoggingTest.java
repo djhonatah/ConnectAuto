@@ -33,7 +33,7 @@ import com.acc.connectauto.service.DealerService;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @Transactional
 @ExtendWith(OutputCaptureExtension.class)
 class LoggingTest {
