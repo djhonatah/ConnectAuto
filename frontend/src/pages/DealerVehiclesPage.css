@@ -30,6 +30,35 @@
   text-decoration: underline;
 }
 
+.dealer-vehicles-page__success {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 11px 16px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--success);
+  background: var(--success-soft);
+  color: var(--ink);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+}
+
+.dealer-vehicles-page__success-dismiss {
+  border: none;
+  background: none;
+  color: var(--ink-faint);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.dealer-vehicles-page__success-dismiss:hover {
+  color: var(--ink);
+}
+
 .dealer-vehicles-page__table-wrap {
   overflow-x: auto;
   border: 1px solid var(--border);

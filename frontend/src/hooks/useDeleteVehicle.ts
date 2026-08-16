@@ -11,7 +11,10 @@ export function useDeleteVehicle() {
       // de reload manual — é o que a issue #26 pede em "atualizar a listagem
       // após exclusão". O diálogo de confirmação e o botão que disparam essa
       // mutation entram na próxima feature.
+      // Também invalida ['dealers'], que cobre a listagem de veículos de uma
+      // concessionária específica (['dealers', id, 'vehicles']).
       queryClient.invalidateQueries({ queryKey: ['vehicles'] });
+      queryClient.invalidateQueries({ queryKey: ['dealers'] });
     },
   });
 }

@@ -37,6 +37,7 @@ export interface VehicleInput {
   chassi?: string;
   valor?: number;
   corInterna?: string;
+  dealerId?: number | null;
 }
 
 export const vehiclesApi = {

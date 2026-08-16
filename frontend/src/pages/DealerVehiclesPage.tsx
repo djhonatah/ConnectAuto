@@ -1,4 +1,5 @@
-import { Link, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useDealer } from '../hooks/useDealer';
 import { useDealerVehicles } from '../hooks/useDealerVehicles';
 import { StatusMessage } from '../components/StatusMessage';
@@ -13,6 +14,18 @@ const currencyFormatter = new Intl.NumberFormat('pt-BR', {
 export function DealerVehiclesPage() {
   const { id } = useParams<{ id: string }>();
   const dealerId = Number(id);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const [successMessage, setSuccessMessage] = useState<string | null>(
+    (location.state as { successMessage?: string } | null)?.successMessage ?? null,
+  );
+
+  useEffect(() => {
+    if (location.state) {
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.state, location.pathname, navigate]);
 
   const { data: dealer, isLoading: isLoadingDealer, isError: isDealerError } = useDealer(dealerId);
   const {
@@ -62,6 +75,20 @@ export function DealerVehiclesPage() {
         </Link>
       </header>
 
+      {successMessage && (
+        <p className="dealer-vehicles-page__success" role="status">
+          {successMessage}
+          <button
+            type="button"
+            className="dealer-vehicles-page__success-dismiss"
+            aria-label="Fechar aviso"
+            onClick={() => setSuccessMessage(null)}
+          >
+            ×
+          </button>
+        </p>
+      )}
+
       {vehicles?.length ? (
         <div className="dealer-vehicles-page__table-wrap">
           <table className="dealer-vehicles-page__table">
@@ -98,6 +125,7 @@ export function DealerVehiclesPage() {
                   <td>
                     <Link
                       to={`/veiculos/${vehicle.id}/editar`}
+                      state={{ from: location.pathname }}
                       className="dealer-vehicles-page__edit-link"
                     >
                       Editar

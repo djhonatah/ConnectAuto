@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { VehicleForm, type VehicleFormValues } from '../components/VehicleForm';
 import { StatusMessage } from '../components/StatusMessage';
 import { useVehicle } from '../hooks/useVehicle';
@@ -9,14 +9,22 @@ export function EditVehiclePage() {
   const { id } = useParams<{ id: string }>();
   const vehicleId = Number(id);
   const navigate = useNavigate();
+  const location = useLocation();
+  const backTo = (location.state as { from?: string } | null)?.from ?? '/veiculos';
 
   const { data: vehicle, isLoading, isError, error, refetch } = useVehicle(vehicleId);
   const updateVehicle = useUpdateVehicle();
 
   async function handleSubmit(values: VehicleFormValues) {
     try {
-      await updateVehicle.mutateAsync({ id: vehicleId, data: values });
-      navigate('/veiculos', { state: { successMessage: 'Veículo atualizado com sucesso.' } });
+      // O formulário não tem campo de concessionária (isso é feito à parte,
+      // via associarDealer) — preserva o dealerId atual do veículo para o
+      // PUT não apagar a associação existente.
+      await updateVehicle.mutateAsync({
+        id: vehicleId,
+        data: { ...values, dealerId: vehicle?.dealerId },
+      });
+      navigate(backTo, { state: { successMessage: 'Veículo atualizado com sucesso.' } });
     } catch {
       // Erro tratado via updateVehicle.isError/error, exibido abaixo.
     }
@@ -54,7 +62,7 @@ export function EditVehiclePage() {
             {vehicle.marca} {vehicle.modelo}
           </p>
         </div>
-        <Link to="/veiculos" className="new-vehicle-page__back">
+        <Link to={backTo} className="new-vehicle-page__back">
           ← Voltar para a listagem
         </Link>
       </header>

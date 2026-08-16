@@ -35,6 +35,12 @@ export function HomePage() {
         <span className="home-page__tile-foot">no estoque atual</span>
       </div>
 
+      <Link to="/concessionarias" className="home-page__tile home-page__tile--link">
+        <span className="home-page__tile-label">Concessionárias</span>
+        <p>Cadastre concessionárias e associe veículos do estoque a elas.</p>
+        <span className="home-page__tile-cta">Ver concessionárias →</span>
+      </Link>
+
       <Link to="/sobre" className="home-page__tile home-page__tile--link">
         <span className="home-page__tile-label">Sobre o ConnectAuto</span>
         <p>Como a plataforma organiza o estoque entre concessionárias.</p>
