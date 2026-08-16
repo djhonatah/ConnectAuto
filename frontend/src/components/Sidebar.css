@@ -42,6 +42,15 @@
   flex: 1;
 }
 
+.sidebar__section-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--ink-faint);
+  padding: 0 12px;
+  margin: 4px 0 4px;
+}
+
 .sidebar__nav-item {
   display: flex;
   align-items: center;
@@ -133,6 +142,10 @@
   }
 
   .sidebar__wordmark {
+    display: none;
+  }
+
+  .sidebar__section-label {
     display: none;
   }
 

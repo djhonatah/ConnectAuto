@@ -7,12 +7,17 @@
 .app-main {
   flex: 1;
   min-width: 0;
-  padding: 40px 40px 64px;
+  display: flex;
+  flex-direction: column;
   text-align: left;
 }
 
+.app-content {
+  padding: 40px 40px 64px;
+}
+
 @media (max-width: 640px) {
-  .app-main {
+  .app-content {
     padding: 28px 20px 48px;
   }
 }

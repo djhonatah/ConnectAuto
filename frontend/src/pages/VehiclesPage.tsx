@@ -4,10 +4,19 @@ import { useVehicles } from '../hooks/useVehicles';
 import { useDeleteVehicle } from '../hooks/useDeleteVehicle';
 import { useDealers } from '../hooks/useDealers';
 import { useAssociateDealer } from '../hooks/useAssociateDealer';
+import { useAppSearch } from '../hooks/useAppSearch';
 import { StatusMessage } from '../components/StatusMessage';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { FUEL_LABELS, type Vehicle } from '../services/api/vehicles';
 import './VehiclesPage.css';
+
+function matchesQuery(vehicle: Vehicle, query: string): boolean {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) return true;
+  return [vehicle.marca, vehicle.modelo, vehicle.chassi]
+    .filter((value): value is string => !!value)
+    .some((value) => value.toLowerCase().includes(normalized));
+}
 
 const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -21,6 +30,8 @@ export function VehiclesPage() {
   const associateDealer = useAssociateDealer();
   const location = useLocation();
   const navigate = useNavigate();
+  const searchQuery = useAppSearch();
+  const filteredVehicles = vehicles?.filter((vehicle) => matchesQuery(vehicle, searchQuery));
 
   const [successMessage, setSuccessMessage] = useState<string | null>(
     (location.state as { successMessage?: string } | null)?.successMessage ?? null,
@@ -94,8 +105,9 @@ export function VehiclesPage() {
         <h1>Veículos</h1>
         <div className="vehicles-page__header-actions">
           <span className="vehicles-page__count">
-            {vehicles?.length ?? 0}{' '}
-            {vehicles?.length === 1 ? 'veículo cadastrado' : 'veículos cadastrados'}
+            {searchQuery
+              ? `${filteredVehicles?.length ?? 0} de ${vehicles?.length ?? 0} veículos`
+              : `${vehicles?.length ?? 0} ${vehicles?.length === 1 ? 'veículo cadastrado' : 'veículos cadastrados'}`}
             {isFetching && ' · atualizando…'}
           </span>
           <Link to="/veiculos/novo" className="btn btn-primary btn-sm">
@@ -146,7 +158,7 @@ export function VehiclesPage() {
         </p>
       )}
 
-      {vehicles?.length ? (
+      {filteredVehicles?.length ? (
         <div className="vehicles-page__table-wrap">
           <table className="vehicles-page__table">
             <thead>
@@ -162,7 +174,7 @@ export function VehiclesPage() {
               </tr>
             </thead>
             <tbody>
-              {vehicles.map((vehicle) => (
+              {filteredVehicles.map((vehicle) => (
                 <tr key={vehicle.id}>
                   <td>
                     <strong>{vehicle.marca}</strong> {vehicle.modelo}
@@ -216,7 +228,11 @@ export function VehiclesPage() {
           </table>
         </div>
       ) : (
-        <p>Nenhum veículo cadastrado.</p>
+        <p>
+          {searchQuery
+            ? 'Nenhum veículo encontrado para essa busca.'
+            : 'Nenhum veículo cadastrado.'}
+        </p>
       )}
 
       <ConfirmDialog

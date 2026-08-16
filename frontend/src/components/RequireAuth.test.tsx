@@ -40,7 +40,7 @@ describe('RequireAuth', () => {
   });
 
   it('renders the protected content when a session exists', () => {
-    setSession('token-fake', 'admin@connectauto.com.br');
+    setSession('token-fake', 'admin@connectauto.com.br', true);
 
     renderWithRouter();
 

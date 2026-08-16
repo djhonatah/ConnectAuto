@@ -1,165 +1,366 @@
-.home-page {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
+.dashboard__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
-.home-page__intro {
-  grid-column: 1 / -1;
-  padding-bottom: 8px;
+.dashboard__head h1 {
+  font-size: 24px;
+  margin-bottom: 4px;
 }
 
-.home-page__status {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--success);
-  margin-bottom: 14px;
-}
-
-.home-page__status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--success);
-  box-shadow: 0 0 6px var(--success);
-  animation: home-page-pulse 2s ease-in-out infinite;
-}
-
-@keyframes home-page-pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.35;
-  }
-}
-
-.home-page__intro h1 {
-  font-size: 34px;
-}
-
-.home-page__lead {
-  margin: 12px 0 0;
-  max-width: 52ch;
-  font-size: 16px;
+.dashboard__head p {
   color: var(--ink-soft);
+  font-size: 13.5px;
 }
 
-.home-page__actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 24px;
+/* ---------- metric cards ---------- */
+.dashboard__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
-.home-page__tile {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 22px 22px 22px 26px;
+.metric-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-.home-page__tile::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: var(--accent);
-  box-shadow: 0 0 10px var(--accent-glow);
-}
-
-.home-page__tile-label {
-  font-size: 12.5px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-}
-
-.home-page__stat {
-  font-family: var(--mono);
-  font-size: 40px;
-  line-height: 1.1;
-  color: var(--accent-strong);
-  text-shadow: 0 0 18px var(--accent-glow);
-}
-
-.home-page__stat-spinner {
-  display: inline-block;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  border: 3px solid var(--border);
-  border-top-color: var(--accent);
-  filter: drop-shadow(0 0 4px var(--accent-glow));
-  animation: home-page-spin 0.7s linear infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .home-page__stat-spinner {
-    animation: none;
-  }
-}
-
-@keyframes home-page-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.home-page__tile-foot {
-  font-size: 13px;
-  color: var(--ink-soft);
-}
-
-.home-page__tile--link {
-  text-decoration: none;
-  color: inherit;
-  justify-content: center;
+  padding: 20px;
   transition:
-    border-color 0.15s ease,
-    transform 0.12s ease;
+    transform 0.18s ease,
+    border-color 0.18s ease;
 }
 
-.home-page__tile--link p {
-  font-size: 14px;
-  color: var(--ink-soft);
+.metric-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-strong);
 }
 
-.home-page__tile-cta {
-  margin-top: 8px;
-  font-size: 13px;
-  font-weight: 600;
+.metric-card__icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.metric-card__icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+.metric-card__icon--accent {
+  background: var(--accent-soft);
   color: var(--accent);
 }
 
-.home-page__tile--link:hover {
-  border-color: var(--accent);
-  transform: translateY(-1px);
+.metric-card__icon--success {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.metric-card__icon--neutral {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ink-soft);
+}
+
+.metric-card__value {
+  font-family: var(--display);
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--ink);
+}
+
+.metric-card__label {
+  color: var(--ink-soft);
+  font-size: 12.5px;
+}
+
+/* ---------- panels (bar chart / donut) ---------- */
+.dashboard__grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+}
+
+.panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.panel__head h3 {
+  font-family: var(--display);
+  font-size: 15.5px;
+}
+
+.panel__tag {
+  font-size: 11.5px;
+  color: var(--ink-faint);
+}
+
+.dashboard__empty {
+  color: var(--ink-soft);
+  font-size: 13.5px;
+}
+
+.dashboard__bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  height: 150px;
+  padding-top: 10px;
+}
+
+.dashboard__bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.dashboard__bar-track {
+  width: 100%;
+  height: 120px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.dashboard__bar-fill {
+  width: 100%;
+  min-height: 4px;
+  border-radius: 6px 6px 3px 3px;
+  background: linear-gradient(180deg, var(--accent), var(--accent-dim));
+}
+
+.dashboard__bar-col span {
+  font-size: 11px;
+  color: var(--ink-soft);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.dashboard__donut-wrap {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: center;
+}
+
+.dashboard__donut {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.dashboard__donut::after {
+  content: '';
+  position: absolute;
+  inset: 18px;
+  border-radius: 50%;
+  background: var(--surface);
+}
+
+.dashboard__legend {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+
+.dashboard__legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboard__legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* ---------- fuel chip ---------- */
+.fuel-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 6px;
+  letter-spacing: 1px;
+  position: relative;
+}
+
+.fuel-chip::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+}
+
+.fuel-flex {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.fuel-flex::before {
+  background: var(--accent);
+}
+
+.fuel-eletrico {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.fuel-eletrico::before {
+  background: var(--success);
+}
+
+.fuel-hibrido,
+.fuel-outros {
+  background: rgba(139, 146, 160, 0.14);
+  color: #b8bec8;
+}
+
+.fuel-hibrido::before,
+.fuel-outros::before {
+  background: #b8bec8;
+}
+
+/* ---------- recent vehicles table ---------- */
+.dashboard__table-head {
+  margin-bottom: 14px;
+}
+
+.dashboard__table-head h3 {
+  font-family: var(--display);
+  font-size: 17px;
+}
+
+.dashboard__table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow-x: auto;
+}
+
+.dashboard__table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+}
+
+.dashboard__table thead th {
+  text-align: left;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--ink-faint);
+  padding: 13px 20px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+}
+
+.dashboard__table tbody td {
+  padding: 14px 20px;
+  font-size: 13.5px;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink);
+}
+
+.dashboard__table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.dashboard__table tbody tr:hover {
+  background: var(--surface-raised);
+}
+
+.dashboard__car-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dashboard__car-swatch {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.dashboard__car-model {
+  font-weight: 600;
+}
+
+.dashboard__car-brand {
+  color: var(--ink-faint);
+  font-size: 12px;
+}
+
+.dashboard__dealer-cell {
+  color: var(--ink-soft);
+}
+
+.dashboard__value-cell {
+  font-family: var(--mono);
+}
+
+.dashboard__row-action {
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.dashboard__row-action:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+  .dashboard__metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard__grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
-  .home-page {
-    grid-template-columns: 1fr;
-  }
-
-  .home-page__actions {
+  .dashboard__head {
     flex-direction: column;
+    align-items: flex-start;
   }
 
-  .home-page__actions .btn {
-    width: 100%;
+  .dashboard__metrics {
+    grid-template-columns: 1fr;
   }
 }

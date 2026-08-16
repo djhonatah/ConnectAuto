@@ -69,6 +69,7 @@ export function Sidebar() {
       </Link>
 
       <nav aria-label="Navegação principal" className="sidebar__nav">
+        <span className="sidebar__section-label">Geral</span>
         {NAV_ITEMS.map((item) => (
           <NavLink key={item.to} to={item.to} end={item.end} className="sidebar__nav-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

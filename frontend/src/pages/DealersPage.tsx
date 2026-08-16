@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDealers } from '../hooks/useDealers';
 import { useDeleteDealer } from '../hooks/useDeleteDealer';
+import { useAppSearch } from '../hooks/useAppSearch';
 import { StatusMessage } from '../components/StatusMessage';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import type { Dealer } from '../services/api/dealers';
@@ -13,11 +14,24 @@ function formatCnpj(cnpj: string): string {
   return digits.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
 }
 
+function matchesQuery(dealer: Dealer, query: string): boolean {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) return true;
+  const digitsOnly = normalized.replace(/\D/g, '');
+  return (
+    dealer.razaoSocial.toLowerCase().includes(normalized) ||
+    dealer.endereco.cidade.toLowerCase().includes(normalized) ||
+    (digitsOnly.length > 0 && dealer.cnpj.includes(digitsOnly))
+  );
+}
+
 export function DealersPage() {
   const { data: dealers, isLoading, isError, error, refetch, isFetching } = useDealers();
   const deleteDealer = useDeleteDealer();
   const location = useLocation();
   const navigate = useNavigate();
+  const searchQuery = useAppSearch();
+  const filteredDealers = dealers?.filter((dealer) => matchesQuery(dealer, searchQuery));
 
   const [successMessage, setSuccessMessage] = useState<string | null>(
     (location.state as { successMessage?: string } | null)?.successMessage ?? null,
@@ -74,8 +88,9 @@ export function DealersPage() {
         <h1>Concessionárias</h1>
         <div className="dealers-page__header-actions">
           <span className="dealers-page__count">
-            {dealers?.length ?? 0}{' '}
-            {dealers?.length === 1 ? 'concessionária cadastrada' : 'concessionárias cadastradas'}
+            {searchQuery
+              ? `${filteredDealers?.length ?? 0} de ${dealers?.length ?? 0} concessionárias`
+              : `${dealers?.length ?? 0} ${dealers?.length === 1 ? 'concessionária cadastrada' : 'concessionárias cadastradas'}`}
             {isFetching && ' · atualizando…'}
           </span>
           <Link to="/concessionarias/novo" className="btn btn-primary btn-sm">
@@ -112,7 +127,7 @@ export function DealersPage() {
         </p>
       )}
 
-      {dealers?.length ? (
+      {filteredDealers?.length ? (
         <div className="dealers-page__table-wrap">
           <table className="dealers-page__table">
             <thead>
@@ -125,7 +140,7 @@ export function DealersPage() {
               </tr>
             </thead>
             <tbody>
-              {dealers.map((dealer) => (
+              {filteredDealers.map((dealer) => (
                 <tr key={dealer.id}>
                   <td>
                     <strong>{dealer.razaoSocial}</strong>
@@ -166,7 +181,11 @@ export function DealersPage() {
           </table>
         </div>
       ) : (
-        <p>Nenhuma concessionária cadastrada.</p>
+        <p>
+          {searchQuery
+            ? 'Nenhuma concessionária encontrada para essa busca.'
+            : 'Nenhuma concessionária cadastrada.'}
+        </p>
       )}
 
       <ConfirmDialog

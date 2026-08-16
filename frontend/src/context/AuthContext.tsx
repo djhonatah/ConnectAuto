@@ -19,8 +19,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryClient.clear();
   }, []);
 
-  const login = useCallback((token: string, userEmail: string) => {
-    setSession(token, userEmail);
+  const login = useCallback((token: string, userEmail: string, remember: boolean) => {
+    setSession(token, userEmail, remember);
     setEmail(userEmail);
   }, []);
 
