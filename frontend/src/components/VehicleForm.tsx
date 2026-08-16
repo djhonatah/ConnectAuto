@@ -1,7 +1,10 @@
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useDealers } from '../hooks/useDealers';
 import { FUEL_LABELS, type FuelType } from '../services/api/vehicles';
+import { formatCurrencyValue, maskCurrency, parseCurrency } from '../utils/masks';
 import './VehicleForm.css';
 
 const CURRENT_YEAR = new Date().getFullYear();
@@ -30,11 +33,18 @@ const vehicleFormSchema = z.object({
     (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
     z.string().trim().max(17, 'Chassi deve ter no máximo 17 caracteres').optional(),
   ),
+  // O campo é uma máscara de moeda (string "1.234,56"), não um <input
+  // type="number">, daí o parseCurrency em vez de Number() puro.
   valor: z.preprocess(
-    (value) => (value === '' || value === undefined ? undefined : Number(value)),
+    (value) =>
+      typeof value === 'string' && value.trim() !== '' ? parseCurrency(value) : undefined,
     z.number().nonnegative('Valor não pode ser negativo').optional(),
   ),
   corInterna: z.string().trim().optional(),
+  dealerId: z.preprocess(
+    (value) => (value === '' || value === undefined ? undefined : Number(value)),
+    z.number().optional(),
+  ),
 });
 
 type VehicleFormInput = z.input<typeof vehicleFormSchema>;
@@ -47,14 +57,39 @@ interface VehicleFormProps {
 }
 
 export function VehicleForm({ defaultValues, onSubmit, submitLabel = 'Salvar' }: VehicleFormProps) {
+  const { data: dealers } = useDealers();
+
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<VehicleFormInput, unknown, VehicleFormValues>({
     resolver: zodResolver(vehicleFormSchema),
-    defaultValues: { tipoCombustivel: '', ...defaultValues },
+    defaultValues: {
+      tipoCombustivel: '',
+      ...defaultValues,
+      // Máscara aplicada aqui (não em quem chama o form) pra edição já abrir
+      // com o valor formatado, venha ele como número (da API) ou string.
+      valor:
+        typeof defaultValues?.valor === 'number'
+          ? formatCurrencyValue(defaultValues.valor)
+          : defaultValues?.valor,
+      dealerId: defaultValues?.dealerId ?? '',
+    },
   });
+
+  // As opções da concessionária chegam de forma assíncrona (useDealers) — se
+  // a lista ainda não tinha carregado quando o <select> montou, o valor
+  // inicial não "gruda" em nenhuma <option> (nenhuma existia ainda). Assim
+  // que a lista chega, força a seleção pro dealerId que veio em defaultValues.
+  useEffect(() => {
+    if (dealers && defaultValues?.dealerId !== undefined) {
+      setValue('dealerId', defaultValues.dealerId);
+    }
+  }, [dealers, defaultValues?.dealerId, setValue]);
+
+  const valorField = register('valor');
 
   return (
     <form className="vehicle-form" onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -104,13 +139,23 @@ export function VehicleForm({ defaultValues, onSubmit, submitLabel = 'Salvar' }:
 
         <div className="vehicle-form__field">
           <label htmlFor="valor">Valor (R$)</label>
-          <input
-            id="valor"
-            type="number"
-            step="0.01"
-            {...register('valor')}
-            aria-invalid={!!errors.valor}
-          />
+          <div className="vehicle-form__currency">
+            <span>R$</span>
+            <input
+              id="valor"
+              type="text"
+              inputMode="decimal"
+              placeholder="0,00"
+              name={valorField.name}
+              ref={valorField.ref}
+              onBlur={valorField.onBlur}
+              onChange={(e) => {
+                e.target.value = maskCurrency(e.target.value);
+                valorField.onChange(e);
+              }}
+              aria-invalid={!!errors.valor}
+            />
+          </div>
           {errors.valor && <span className="vehicle-form__error">{errors.valor.message}</span>}
         </div>
 
@@ -129,6 +174,21 @@ export function VehicleForm({ defaultValues, onSubmit, submitLabel = 'Salvar' }:
         <div className="vehicle-form__field">
           <label htmlFor="corInterna">Cor interna</label>
           <input id="corInterna" type="text" {...register('corInterna')} />
+        </div>
+
+        <div className="vehicle-form__field">
+          <label htmlFor="dealerId">Concessionária</label>
+          <select id="dealerId" {...register('dealerId')} aria-invalid={!!errors.dealerId}>
+            <option value="">Sem concessionária</option>
+            {dealers?.map((dealer) => (
+              <option key={dealer.id} value={dealer.id}>
+                {dealer.razaoSocial}
+              </option>
+            ))}
+          </select>
+          {errors.dealerId && (
+            <span className="vehicle-form__error">{errors.dealerId.message}</span>
+          )}
         </div>
       </div>
 

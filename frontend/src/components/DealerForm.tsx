@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useCepLookup } from '../hooks/useCepLookup';
+import { maskCep, maskCnpj } from '../utils/masks';
 import './DealerForm.css';
 
 const UFS = [
@@ -79,6 +80,18 @@ interface DealerFormProps {
 }
 
 export function DealerForm({ defaultValues, onSubmit, submitLabel = 'Salvar' }: DealerFormProps) {
+  // Máscara aplicada aqui (não em quem chama o form) pra edição já abrir com
+  // CNPJ/CEP formatados, venha o valor de onde vier.
+  const initialValues: DealerFormValues = {
+    razaoSocial: defaultValues?.razaoSocial ?? '',
+    cnpj: '',
+    endereco: { cep: '', logradouro: '', bairro: '', cidade: '', estado: '' },
+  };
+  Object.assign(initialValues, defaultValues);
+  initialValues.endereco = { ...initialValues.endereco, ...defaultValues?.endereco };
+  initialValues.cnpj = maskCnpj(initialValues.cnpj);
+  initialValues.endereco.cep = maskCep(initialValues.endereco.cep);
+
   const {
     register,
     handleSubmit,
@@ -87,13 +100,11 @@ export function DealerForm({ defaultValues, onSubmit, submitLabel = 'Salvar' }: 
     formState: { errors, isSubmitting },
   } = useForm<DealerFormValues>({
     resolver: zodResolver(dealerFormSchema),
-    defaultValues: {
-      razaoSocial: '',
-      cnpj: '',
-      endereco: { cep: '', logradouro: '', bairro: '', cidade: '', estado: '' },
-      ...defaultValues,
-    },
+    defaultValues: initialValues,
   });
+
+  const cnpjField = register('cnpj');
+  const cepField = register('endereco.cep');
 
   const cepDigits = watch('endereco.cep').replace(/\D/g, '');
   const cepLookup = useCepLookup(cepDigits);
@@ -127,9 +138,16 @@ export function DealerForm({ defaultValues, onSubmit, submitLabel = 'Salvar' }: 
           <input
             id="cnpj"
             type="text"
+            inputMode="numeric"
             placeholder="00.000.000/0000-00"
             maxLength={18}
-            {...register('cnpj')}
+            name={cnpjField.name}
+            ref={cnpjField.ref}
+            onBlur={cnpjField.onBlur}
+            onChange={(e) => {
+              e.target.value = maskCnpj(e.target.value);
+              cnpjField.onChange(e);
+            }}
             aria-invalid={!!errors.cnpj}
           />
           {errors.cnpj && <span className="dealer-form__error">{errors.cnpj.message}</span>}
@@ -144,9 +162,16 @@ export function DealerForm({ defaultValues, onSubmit, submitLabel = 'Salvar' }: 
           <input
             id="cep"
             type="text"
+            inputMode="numeric"
             placeholder="00000-000"
             maxLength={9}
-            {...register('endereco.cep')}
+            name={cepField.name}
+            ref={cepField.ref}
+            onBlur={cepField.onBlur}
+            onChange={(e) => {
+              e.target.value = maskCep(e.target.value);
+              cepField.onChange(e);
+            }}
             aria-invalid={!!errors.endereco?.cep}
           />
           {errors.endereco?.cep ? (

@@ -56,6 +56,45 @@
   border-color: var(--danger);
 }
 
+.vehicle-form__currency {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface-sunken);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.vehicle-form__currency:has(input:focus-visible) {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.vehicle-form__currency:has(input[aria-invalid='true']) {
+  border-color: var(--danger);
+}
+
+.vehicle-form__currency span {
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+
+.vehicle-form__currency input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  padding: 9px 0;
+}
+
+.vehicle-form__currency input:focus-visible {
+  outline: none;
+}
+
 .vehicle-form__error {
   font-size: 12.5px;
   color: var(--danger-strong);

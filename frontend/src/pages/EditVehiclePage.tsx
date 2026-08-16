@@ -17,13 +17,7 @@ export function EditVehiclePage() {
 
   async function handleSubmit(values: VehicleFormValues) {
     try {
-      // O formulário não tem campo de concessionária (isso é feito à parte,
-      // via associarDealer) — preserva o dealerId atual do veículo para o
-      // PUT não apagar a associação existente.
-      await updateVehicle.mutateAsync({
-        id: vehicleId,
-        data: { ...values, dealerId: vehicle?.dealerId },
-      });
+      await updateVehicle.mutateAsync({ id: vehicleId, data: values });
       navigate(backTo, { state: { successMessage: 'Veículo atualizado com sucesso.' } });
     } catch {
       // Erro tratado via updateVehicle.isError/error, exibido abaixo.
@@ -83,6 +77,7 @@ export function EditVehiclePage() {
           chassi: vehicle.chassi,
           valor: vehicle.valor,
           corInterna: vehicle.corInterna,
+          dealerId: vehicle.dealerId ?? undefined,
         }}
         onSubmit={handleSubmit}
         submitLabel="Salvar alterações"

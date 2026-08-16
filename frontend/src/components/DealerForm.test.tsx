@@ -162,7 +162,7 @@ describe('DealerForm', () => {
     });
 
     expect(screen.getByLabelText('Razão social *')).toHaveValue('Auto Center Silva Ltda');
-    expect(screen.getByLabelText('CNPJ *')).toHaveValue('11222333000181');
+    expect(screen.getByLabelText('CNPJ *')).toHaveValue('11.222.333/0001-81');
     expect(screen.getByLabelText('Estado *')).toHaveValue('SP');
     expect(screen.getByRole('button', { name: 'Salvar alterações' })).toBeInTheDocument();
 
