@@ -26,7 +26,10 @@ const vehicleFormSchema = z.object({
       .max(CURRENT_YEAR + 1, 'Ano inválido')
       .optional(),
   ),
-  chassi: z.string().trim().max(17, 'Chassi deve ter no máximo 17 caracteres').optional(),
+  chassi: z.preprocess(
+    (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
+    z.string().trim().max(17, 'Chassi deve ter no máximo 17 caracteres').optional(),
+  ),
   valor: z.preprocess(
     (value) => (value === '' || value === undefined ? undefined : Number(value)),
     z.number().nonnegative('Valor não pode ser negativo').optional(),
@@ -34,10 +37,6 @@ const vehicleFormSchema = z.object({
   corInterna: z.string().trim().optional(),
 });
 
-// O schema transforma a entrada crua do formulário (strings dos <input>,
-// "" para campos vazios) na saída validada (número, FuelType, etc). Por isso
-// usamos dois tipos: Input é o que os campos guardam enquanto o usuário
-// digita, VehicleFormValues é o que o onSubmit recebe já validado/convertido.
 type VehicleFormInput = z.input<typeof vehicleFormSchema>;
 export type VehicleFormValues = z.output<typeof vehicleFormSchema>;
 

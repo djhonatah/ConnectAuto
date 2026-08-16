@@ -83,6 +83,9 @@ public class VehicleService {
     }
 
     private Vehicle salvarComDealer(Vehicle vehicle, Long dealerId) {
+        if (vehicle.getChassi() != null && vehicle.getChassi().isBlank()) {
+            vehicle.setChassi(null);
+        }
         vehicle.setDealer(buscarDealerOpcional(dealerId));
         return vehicleRepository.save(vehicle);
     }
