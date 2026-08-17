@@ -129,6 +129,24 @@ npm run test              # roda os testes (Vitest) uma vez
 npm run test:watch         # roda os testes em modo watch
 ```
 
+## Como rodar com Docker
+
+Alternativa aos dois passos acima: sobe backend e frontend juntos, sem precisar instalar Java, Maven ou Node na máquina — só o [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+
+```bash
+cp .env.example .env
+# edite o .env e preencha as variáveis (veja a tabela em Variáveis de ambiente)
+
+docker compose up --build
+```
+
+- Backend: `http://localhost:8080`
+- Frontend: `http://localhost:5173`
+
+O `.env` na raiz não vai pro Git (já coberto pelo `.gitignore`) — use-o só para rodar localmente. Para parar: `docker compose down`.
+
+Esse fluxo é focado em subir a aplicação pronta para uso/avaliação; para desenvolver com hot-reload, prefira rodar backend e frontend manualmente como descrito acima.
+
 ## Variáveis de ambiente
 
 O frontend lê a URL do backend da variável `VITE_API_URL`.
