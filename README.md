@@ -1,4 +1,4 @@
-# ConnectAuto
+# <img src="frontend/public/favicon.svg" width="32" height="32" align="center" alt="Logo ConnectAuto" /> ConnectAuto
 
 Sistema de gestão de estoque de veículos para concessionárias: login, cadastro de veículos e concessionárias, associação entre eles e um dashboard com dados reais — backend em Spring Boot e frontend em React.
 
@@ -9,7 +9,7 @@ Sistema de gestão de estoque de veículos para concessionárias: login, cadastr
 >
 > | Campo | Valor                          |
 > | ----- | ------------------------------- |
-> | URL   | `http://localhost:5173/login`   |
+> | URL   | `http://127.0.0.1:5173/login`   |
 > | Email | `admin@connectauto.com.br`      |
 > | Senha | `connectauto123`                |
 >
@@ -140,10 +140,13 @@ cp .env.example .env
 docker compose up --build
 ```
 
-- Backend: `http://localhost:8080`
-- Frontend: `http://localhost:5173`
+- Backend: `http://127.0.0.1:8080`
+- Frontend: `http://127.0.0.1:5173`
 
-O `.env` na raiz não vai pro Git (já coberto pelo `.gitignore`) — use-o só para rodar localmente. Para parar: `docker compose down`.
+> [!WARNING]
+> Acesse por `127.0.0.1`, **não** por `localhost`. No Windows, o Docker Desktop encaminha `localhost` primeiro por IPv6 (`::1`), e esse encaminhamento costuma travar/demorar bastante para os containers — usar o IPv4 direto (`127.0.0.1`) evita o problema. Por isso `VITE_API_URL` e `CONNECTAUTO_CORS_ALLOWED_ORIGINS` já vêm configurados com `127.0.0.1` no `docker-compose.yml`.
+
+O `.env` na raiz não vai pro Git (já coberto pelo `.gitignore`) — use-o só para rodar localmente. Para parar: `docker compose down`. Para resetar tudo (containers, imagens buildadas) e testar do zero: `docker compose down --rmi all` seguido de `docker compose up --build`.
 
 Esse fluxo é focado em subir a aplicação pronta para uso/avaliação; para desenvolver com hot-reload, prefira rodar backend e frontend manualmente como descrito acima.
 
