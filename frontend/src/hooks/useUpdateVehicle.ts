@@ -8,8 +8,6 @@ export function useUpdateVehicle() {
     mutationFn: ({ id, data }: { id: number; data: VehicleInput }) =>
       vehiclesApi.atualizar(id, data),
     onSuccess: () => {
-      // Também invalida ['dealers'] (que cobre ['dealers', id, 'vehicles']),
-      // já que a tela de veículos de uma concessionária mostra esses dados.
       queryClient.invalidateQueries({ queryKey: ['vehicles'] });
       queryClient.invalidateQueries({ queryKey: ['dealers'] });
     },

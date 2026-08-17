@@ -12,10 +12,6 @@ interface ConfirmDialogProps {
   onCancel: () => void;
 }
 
-/**
- * Diálogo de confirmação genérico, baseado em <dialog> nativo: o navegador
- * já cuida de foco preso dentro do diálogo, fechar com Esc e um backdrop.
- */
 export function ConfirmDialog({
   open,
   title,
@@ -44,8 +40,6 @@ export function ConfirmDialog({
       className="confirm-dialog"
       onCancel={onCancel}
       onClick={(event) => {
-        // Clique no backdrop (::backdrop) cai direto no <dialog>, nunca nos
-        // filhos — é assim que diferenciamos "clicou fora" de "clicou dentro".
         if (event.target === dialogRef.current) onCancel();
       }}
     >

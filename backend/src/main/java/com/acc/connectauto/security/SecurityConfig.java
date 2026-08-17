@@ -44,7 +44,6 @@ public class SecurityConfig {
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(restAuthenticationEntryPoint)
                         .accessDeniedHandler(restAccessDeniedHandler))
-                // Console H2 roda dentro de um <iframe>; sem isso o navegador bloqueia por X-Frame-Options.
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login").permitAll()
@@ -57,9 +56,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // Mesma origem/propriedade que o CorsConfig antigo usava — agora vive aqui
-    // porque o Spring Security intercepta a requisição antes do WebMvcConfigurer,
-    // então precisa ser o próprio filter chain a liberar o CORS.
     private CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(allowedOrigins));

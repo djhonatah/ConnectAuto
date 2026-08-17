@@ -7,8 +7,6 @@ export function useDeleteVehicle() {
   return useMutation({
     mutationFn: (vehicleId: number) => vehiclesApi.excluir(vehicleId),
     onSuccess: () => {
-      // Também invalida ['dealers'], que cobre a listagem de veículos de uma
-      // concessionária específica (['dealers', id, 'vehicles']).
       queryClient.invalidateQueries({ queryKey: ['vehicles'] });
       queryClient.invalidateQueries({ queryKey: ['dealers'] });
     },

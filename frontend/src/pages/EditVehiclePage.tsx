@@ -20,7 +20,6 @@ export function EditVehiclePage() {
       await updateVehicle.mutateAsync({ id: vehicleId, data: values });
       navigate(backTo, { state: { successMessage: 'Veículo atualizado com sucesso.' } });
     } catch {
-      // Erro tratado via updateVehicle.isError/error, exibido abaixo.
     }
   }
 

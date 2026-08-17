@@ -49,8 +49,6 @@ class CnpjFormatValidationTest {
 
     @Test
     void deveRejeitarCnpjComMascara() {
-        // @CNPJ sozinho aceitaria; o @Pattern (\d{14}) é quem barra a máscara aqui,
-        // mantendo o mesmo formato de armazenamento (só dígitos) já usado no banco.
         assertThat(validarCnpj("12.345.678/0001-95")).isNotEmpty();
     }
 

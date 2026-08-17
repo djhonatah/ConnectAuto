@@ -12,8 +12,6 @@ export function NewVehiclePage() {
       await createVehicle.mutateAsync(values);
       navigate('/veiculos', { state: { successMessage: 'Veículo cadastrado com sucesso.' } });
     } catch {
-      // Erro já fica disponível via createVehicle.isError/error, exibido
-      // abaixo — só evitamos que a rejeição vaze como unhandled promise.
     }
   }
 

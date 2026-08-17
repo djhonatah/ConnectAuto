@@ -11,11 +11,6 @@ export class ApiError extends Error {
   }
 }
 
-/**
- * Wrapper fino sobre fetch: resolve a URL contra API_BASE_URL, define
- * headers JSON por padrão (mais o token de sessão, se houver) e lança
- * ApiError em respostas não-2xx.
- */
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const token = getToken();
   const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -28,8 +23,6 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
-    // 401 com token anexado = sessão expirou/invalidou no servidor (não um
-    // simples login errado, que não tem token). Avisa a aplicação reagir.
     if (response.status === 401 && token) {
       window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
     }
@@ -49,7 +42,6 @@ async function extractErrorMessage(response: Response, path: string): Promise<st
     if (body.details?.length) return body.details.join('; ');
     if (body.message) return body.message;
   } catch {
-    /* corpo não é JSON, cai na mensagem genérica abaixo */
   }
   return `Erro ${response.status} ao chamar ${path}`;
 }

@@ -80,8 +80,6 @@ interface DealerFormProps {
 }
 
 export function DealerForm({ defaultValues, onSubmit, submitLabel = 'Salvar' }: DealerFormProps) {
-  // Máscara aplicada aqui (não em quem chama o form) pra edição já abrir com
-  // CNPJ/CEP formatados, venha o valor de onde vier.
   const initialValues: DealerFormValues = {
     razaoSocial: defaultValues?.razaoSocial ?? '',
     cnpj: '',

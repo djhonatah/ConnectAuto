@@ -14,9 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import tools.jackson.databind.ObjectMapper;
 
-// Diferente dos outros *ControllerTest (addFilters = false), este roda com a
-// cadeia de filtros do Spring Security ativa de verdade — é o que garante
-// que login, token e bloqueio de endpoint protegido funcionam de ponta a ponta.
 @SpringBootTest
 @AutoConfigureMockMvc
 class AuthControllerTest {

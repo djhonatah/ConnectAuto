@@ -14,7 +14,6 @@ export function NewDealerPage() {
         state: { successMessage: 'Concessionária cadastrada com sucesso.' },
       });
     } catch {
-      // Erro já fica disponível via createDealer.isError/error, exibido abaixo.
     }
   }
 

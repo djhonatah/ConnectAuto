@@ -56,12 +56,8 @@ public class DealerService {
         return dealerMapper.toDTO(buscarEntidadePorId(dealerId));
     }
 
-    // Sem @Transactional própria (assim como em criar()): evita segurar
-    // conexão de banco durante a chamada ao ViaCEP.
     public DealerResponseDTO atualizar(Long dealerId, DealerRequestDTO dealerRequestDTO) {
         validarEnderecoInformado(dealerRequestDTO);
-        // Busca o dealer ANTES de consultar o ViaCEP: se o id não existir, falha rápido
-        // (404) sem gastar uma chamada HTTP externa desnecessária.
         Dealer dealer = buscarEntidadePorId(dealerId);
 
         EnderecoDTO enderecoOficialDTO = cepPermaneceuOMesmo(dealerRequestDTO, dealer)

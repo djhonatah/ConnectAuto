@@ -2,8 +2,6 @@ interface BrandMarkProps {
   className?: string;
 }
 
-/** Marca ConnectAuto: pino de localização + silhueta de carro, sempre sobre
- * fundo branco — usada na sidebar e na tela de login. */
 export function BrandMark({ className }: BrandMarkProps) {
   return (
     <svg className={className} viewBox="-10 -6 120 140" aria-hidden="true">

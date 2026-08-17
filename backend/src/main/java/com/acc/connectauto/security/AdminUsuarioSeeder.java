@@ -11,8 +11,6 @@ import com.acc.connectauto.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-// Este projeto usa um unico usuario fixo (sem tela de cadastro): garante que
-// ele exista no banco a cada subida, sem duplicar se ja estiver la.
 @Slf4j
 @Component
 @RequiredArgsConstructor

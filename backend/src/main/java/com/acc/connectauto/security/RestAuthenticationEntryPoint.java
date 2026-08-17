@@ -16,9 +16,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
-// Entra em cena quando um endpoint protegido recebe requisicao sem token (ou
-// com token invalido) — mantem o mesmo formato de ApiError usado no resto da
-// API, que o httpClient do frontend ja sabe interpretar.
 @Component
 @RequiredArgsConstructor
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {

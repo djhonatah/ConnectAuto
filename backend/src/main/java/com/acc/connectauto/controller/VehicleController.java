@@ -71,8 +71,6 @@ public class VehicleController {
         return ResponseEntity.noContent().build();
     }
 
-    // PATCH em vez de PUT: altera só a associação com o Dealer, não o veículo
-    // inteiro.
     @PatchMapping("/{vehicleId}/dealer")
     public ResponseEntity<VehicleResponseDTO> associarDealer(
             @PathVariable Long vehicleId,

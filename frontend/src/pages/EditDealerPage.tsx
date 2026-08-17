@@ -20,7 +20,6 @@ export function EditDealerPage() {
         state: { successMessage: 'Concessionária atualizada com sucesso.' },
       });
     } catch {
-      // Erro tratado via updateDealer.isError/error, exibido abaixo.
     }
   }
 

@@ -49,7 +49,6 @@ export function LoginPage() {
       });
       navigate(redirectTo, { replace: true });
     } catch {
-      // Erro já fica disponível via login.isError/error, exibido abaixo.
     }
   }
 

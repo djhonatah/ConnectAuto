@@ -51,7 +51,6 @@ class ViaCepClientTest {
         RestClient.Builder restClientBuilder = RestClient.builder();
         MockRestServiceServer mockServer = MockRestServiceServer.bindTo(restClientBuilder).build();
 
-        // O ViaCEP não devolve 404 para CEP inexistente: devolve 200 com {"erro": true}.
         mockServer.expect(requestTo("https://viacep.com.br/ws/00000000/json/"))
                 .andRespond(withSuccess("""
                         {"erro": true}

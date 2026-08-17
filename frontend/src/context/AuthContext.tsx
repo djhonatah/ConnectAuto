@@ -15,7 +15,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     clearSession();
     setEmail(null);
-    // Estoque/concessionárias em cache pertencem à sessão que acabou de sair.
     queryClient.clear();
   }, []);
 
