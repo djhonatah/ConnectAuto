@@ -1,6 +1,30 @@
 # <img src="frontend/public/favicon.svg" width="32" height="32" align="center" alt="Logo ConnectAuto" /> ConnectAuto
 
+![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4-6DB33F?logo=springboot&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)
+
 Sistema de gestão de estoque de veículos para concessionárias: login, cadastro de veículos e concessionárias, associação entre eles e um dashboard com dados reais — backend em Spring Boot e frontend em React.
+
+## Índice
+
+- [Credenciais de acesso](#credenciais-de-acesso)
+- [Stack](#stack)
+- [Arquitetura](#arquitetura)
+  - [Principais decisões técnicas](#principais-decisões-técnicas)
+- [Pré-requisitos](#pré-requisitos)
+- [Como rodar com Docker](#como-rodar-com-docker)
+- [Como rodar o backend](#como-rodar-o-backend)
+- [Como rodar o frontend](#como-rodar-o-frontend)
+- [Como rodar os testes](#como-rodar-os-testes)
+- [Variáveis de ambiente](#variáveis-de-ambiente)
+- [Banco H2](#banco-h2)
+  - [Modelo de dados (DER)](#modelo-de-dados-der)
+  - [Acessar o console](#acessar-o-console)
+  - [Popular o banco](#popular-o-banco)
 
 ## Credenciais de acesso
 
@@ -87,6 +111,27 @@ O frontend é organizado em camadas (`services/api` → `hooks` → `components`
 
 Não é necessário instalar Maven: o projeto inclui o Maven Wrapper (`mvnw` / `mvnw.cmd`).
 
+## Como rodar com Docker
+
+Forma mais rápida de subir o projeto: backend e frontend juntos, sem precisar instalar Java, Maven ou Node na máquina — só o [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+
+```bash
+cp .env.example .env
+# edite o .env e preencha as variáveis (veja a tabela em Variáveis de ambiente)
+
+docker compose up --build
+```
+
+- Backend: `http://127.0.0.1:8080`
+- Frontend: `http://127.0.0.1:5173`
+
+> [!WARNING]
+> Acesse por `127.0.0.1`, **não** por `localhost`. No Windows, o Docker Desktop encaminha `localhost` primeiro por IPv6 (`::1`), e esse encaminhamento costuma travar/demorar bastante para os containers — usar o IPv4 direto (`127.0.0.1`) evita o problema. Por isso `VITE_API_URL` e `CONNECTAUTO_CORS_ALLOWED_ORIGINS` já vêm configurados com `127.0.0.1` no `docker-compose.yml`.
+
+O `.env` na raiz não vai pro Git (já coberto pelo `.gitignore`) — use-o só para rodar localmente. Para parar: `docker compose down`. Para resetar tudo (containers, imagens buildadas) e testar do zero: `docker compose down --rmi all` seguido de `docker compose up --build`.
+
+Esse fluxo é focado em subir a aplicação pronta para uso/avaliação; para desenvolver com hot-reload, prefira rodar backend e frontend manualmente, como descrito a seguir.
+
 ## Como rodar o backend
 
 ```bash
@@ -129,26 +174,21 @@ npm run test              # roda os testes (Vitest) uma vez
 npm run test:watch         # roda os testes em modo watch
 ```
 
-## Como rodar com Docker
-
-Alternativa aos dois passos acima: sobe backend e frontend juntos, sem precisar instalar Java, Maven ou Node na máquina — só o [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+## Como rodar os testes
 
 ```bash
-cp .env.example .env
-# edite o .env e preencha as variáveis (veja a tabela em Variáveis de ambiente)
-
-docker compose up --build
+cd backend
+./mvnw test          # Linux/macOS
+mvnw.cmd test         # Windows
 ```
 
-- Backend: `http://127.0.0.1:8080`
-- Frontend: `http://127.0.0.1:5173`
+```bash
+cd frontend
+npm run test          # roda uma vez
+npm run test:watch     # modo watch
+```
 
-> [!WARNING]
-> Acesse por `127.0.0.1`, **não** por `localhost`. No Windows, o Docker Desktop encaminha `localhost` primeiro por IPv6 (`::1`), e esse encaminhamento costuma travar/demorar bastante para os containers — usar o IPv4 direto (`127.0.0.1`) evita o problema. Por isso `VITE_API_URL` e `CONNECTAUTO_CORS_ALLOWED_ORIGINS` já vêm configurados com `127.0.0.1` no `docker-compose.yml`.
-
-O `.env` na raiz não vai pro Git (já coberto pelo `.gitignore`) — use-o só para rodar localmente. Para parar: `docker compose down`. Para resetar tudo (containers, imagens buildadas) e testar do zero: `docker compose down --rmi all` seguido de `docker compose up --build`.
-
-Esse fluxo é focado em subir a aplicação pronta para uso/avaliação; para desenvolver com hot-reload, prefira rodar backend e frontend manualmente como descrito acima.
+Os dados de demonstração ficam desligados nos testes do backend (`connectauto.demo-data.enabled=false` em `backend/src/test/resources/application.properties`), já que várias suítes fazem asserções de contagem exata na base. No frontend, os testes mockam a camada `services/api` — veja [Principais decisões técnicas](#principais-decisões-técnicas) para mais contexto sobre a estratégia de testes dos dois lados.
 
 ## Variáveis de ambiente
 
