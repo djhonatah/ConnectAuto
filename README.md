@@ -4,15 +4,16 @@ Sistema de gestão de estoque de veículos para concessionárias: login, cadastr
 
 ## Credenciais de acesso
 
-A aplicação tem **login obrigatório** (usuário único, sem tela de cadastro). O usuário admin é seedado automaticamente no banco na primeira subida do backend:
-
-| Campo | Valor                       |
-| ----- | ---------------------------- |
-| URL   | `http://localhost:5173/login` |
-| Email | `admin@connectauto.com.br`    |
-| Senha | `connectauto123`              |
-
-Essas são credenciais de **desenvolvimento**, definidas em `backend/src/main/resources/application.properties` (`connectauto.security.admin-email` / `connectauto.security.admin-password`). Antes de qualquer deploy real, sobrescreva-as (e o `connectauto.security.jwt-secret`) via variável de ambiente — veja [Variáveis de ambiente](#variáveis-de-ambiente).
+> [!IMPORTANT]
+> A aplicação tem **login obrigatório** — sem essas credenciais você não acessa nenhuma tela além de `/login`. Usuário único, sem tela de cadastro, seedado automaticamente no banco na primeira subida do backend:
+>
+> | Campo | Valor                          |
+> | ----- | ------------------------------- |
+> | URL   | `http://localhost:5173/login`   |
+> | Email | `admin@connectauto.com.br`      |
+> | Senha | `connectauto123`                |
+>
+> Essas são credenciais de **desenvolvimento**, definidas em `backend/src/main/resources/application.properties` (`connectauto.security.admin-email` / `connectauto.security.admin-password`). Antes de qualquer deploy real, sobrescreva-as (e o `connectauto.security.jwt-secret`) via variável de ambiente — veja [Variáveis de ambiente](#variáveis-de-ambiente).
 
 ## Stack
 
