@@ -10,7 +10,6 @@ import './VehicleForm.css';
 const CURRENT_YEAR = new Date().getFullYear();
 const fuelTypes = Object.keys(FUEL_LABELS) as FuelType[];
 
-// Espelha as validações de VehicleRequestDTO no backend.
 const vehicleFormSchema = z.object({
   marca: z.string().trim().min(1, 'Marca é obrigatória'),
   modelo: z.string().trim().min(1, 'Modelo é obrigatório'),
@@ -33,8 +32,7 @@ const vehicleFormSchema = z.object({
     (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
     z.string().trim().max(17, 'Chassi deve ter no máximo 17 caracteres').optional(),
   ),
-  // O campo é uma máscara de moeda (string "1.234,56"), não um <input
-  // type="number">, daí o parseCurrency em vez de Number() puro.
+
   valor: z.preprocess(
     (value) =>
       typeof value === 'string' && value.trim() !== '' ? parseCurrency(value) : undefined,
@@ -69,8 +67,6 @@ export function VehicleForm({ defaultValues, onSubmit, submitLabel = 'Salvar' }:
     defaultValues: {
       tipoCombustivel: '',
       ...defaultValues,
-      // Máscara aplicada aqui (não em quem chama o form) pra edição já abrir
-      // com o valor formatado, venha ele como número (da API) ou string.
       valor:
         typeof defaultValues?.valor === 'number'
           ? formatCurrencyValue(defaultValues.valor)
@@ -79,12 +75,7 @@ export function VehicleForm({ defaultValues, onSubmit, submitLabel = 'Salvar' }:
     },
   });
 
-  // As opções da concessionária chegam de forma assíncrona (useDealers) — se
-  // a lista ainda não tinha carregado quando o <select> montou, o valor
-  // inicial não "gruda" em nenhuma <option> (nenhuma existia ainda). Assim
-  // que a lista chega pela primeira vez, força a seleção pro dealerId que
-  // veio em defaultValues. O ref evita que um refetch em segundo plano
-  // sobrescreva a escolha do usuário.
+
   const dealerSyncedRef = useRef(false);
   useEffect(() => {
     if (dealers && defaultValues?.dealerId !== undefined && !dealerSyncedRef.current) {

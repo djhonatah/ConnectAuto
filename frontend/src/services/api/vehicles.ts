@@ -24,8 +24,7 @@ export interface Vehicle {
   dealerId: number | null;
 }
 
-// Formato aceito por POST /vehicles e PUT /vehicles/{id} — espelha
-// VehicleRequestDTO no backend.
+
 export interface VehicleInput {
   marca: string;
   modelo: string;

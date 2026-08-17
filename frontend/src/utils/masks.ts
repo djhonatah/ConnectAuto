@@ -1,11 +1,3 @@
-/**
- * Máscaras de digitação. Sempre partem dos dígitos puros do valor recebido
- * (nunca confiam em formatação já presente) — assim colar um valor pronto ou
- * apagar no meio do texto nunca deixa o campo num estado inconsistente. A
- * validação "de verdade" (checksum de CNPJ, 8 dígitos de CEP etc.) continua
- * nos schemas Zod de cada formulário; isso aqui é só a máscara visual.
- */
-
 export function onlyDigits(value: string): string {
   return value.replace(/\D/g, '');
 }

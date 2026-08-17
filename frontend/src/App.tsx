@@ -10,8 +10,7 @@ function App() {
   const location = useLocation();
 
   useEffect(() => {
-    // Trocar de página com uma busca "presa" da tela anterior confunde mais
-    // do que ajuda — cada página começa com a busca limpa.
+
     setQuery('');
   }, [location.pathname]);
 

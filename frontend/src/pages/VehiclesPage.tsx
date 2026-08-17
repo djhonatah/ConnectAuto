@@ -38,8 +38,7 @@ export function VehiclesPage() {
   const [vehicleToDelete, setVehicleToDelete] = useState<Vehicle | null>(null);
 
   useEffect(() => {
-    // Limpa o state da navegação para o aviso não reaparecer num reload ou
-    // ao voltar por aqui de novo; o próprio state virar null evita um loop.
+
     if (location.state) {
       navigate(location.pathname, { replace: true, state: null });
     }

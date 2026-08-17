@@ -4,7 +4,6 @@
   width: 100%;
 }
 
-/* ---------- painel visual (metade esquerda) ---------- */
 .login-page__visual {
   flex: 1.1;
   position: relative;
@@ -29,11 +28,13 @@
 }
 
 @keyframes login-page-glow {
+
   0%,
   100% {
     opacity: 0.12;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.22;
     transform: scale(1.08);
