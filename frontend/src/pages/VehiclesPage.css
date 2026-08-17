@@ -139,21 +139,6 @@
   color: var(--ink);
 }
 
-.vehicles-page__dealer-select {
-  font: inherit;
-  font-size: 13.5px;
-  color: var(--ink);
-  background: var(--surface-sunken);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 5px 8px;
-  max-width: 180px;
-}
-
-.vehicles-page__dealer-select:disabled {
-  opacity: 0.6;
-}
-
 @media (max-width: 560px) {
   .vehicles-page__header-actions {
     width: 100%;

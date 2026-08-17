@@ -12,7 +12,6 @@ vi.mock('../services/api/vehicles', () => ({
     buscarPorId: vi.fn(),
     criar: vi.fn(),
     atualizar: vi.fn(),
-    associarDealer: vi.fn(),
     excluir: vi.fn(),
   },
   FUEL_LABELS: { FLEX: 'Flex' },
@@ -83,7 +82,6 @@ describe('VehiclesPage', () => {
   beforeEach(() => {
     vi.mocked(vehiclesApi.listar).mockReset().mockResolvedValue([corolla, civic]);
     vi.mocked(vehiclesApi.excluir).mockReset().mockResolvedValue(undefined);
-    vi.mocked(vehiclesApi.associarDealer).mockReset().mockResolvedValue(corolla);
     vi.mocked(dealersApi.listar).mockReset().mockResolvedValue([autoCenterSilva]);
   });
 
@@ -171,14 +169,13 @@ describe('VehiclesPage', () => {
     expect(screen.getByText('Corolla')).toBeInTheDocument();
   });
 
-  it('associates a vehicle with a dealer', async () => {
-    const user = userEvent.setup();
+  it('shows the dealer as read-only text, not an editable select', async () => {
     renderPage();
 
     await screen.findByText('Corolla');
     const row = screen.getByText('Corolla').closest('tr')!;
-    await user.selectOptions(within(row).getByRole('combobox'), 'Auto Center Silva Ltda');
 
-    await waitFor(() => expect(vehiclesApi.associarDealer).toHaveBeenCalledWith(1, 1));
+    expect(within(row).queryByRole('combobox')).not.toBeInTheDocument();
+    expect(within(row).getByText('sem concessionária')).toBeInTheDocument();
   });
 });

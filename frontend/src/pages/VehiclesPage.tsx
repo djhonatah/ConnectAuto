@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useVehicles } from '../hooks/useVehicles';
 import { useDeleteVehicle } from '../hooks/useDeleteVehicle';
 import { useDealers } from '../hooks/useDealers';
-import { useAssociateDealer } from '../hooks/useAssociateDealer';
 import { useAppSearch } from '../hooks/useAppSearch';
 import { StatusMessage } from '../components/StatusMessage';
 import { ConfirmDialog } from '../components/ConfirmDialog';
@@ -27,7 +26,6 @@ export function VehiclesPage() {
   const { data: vehicles, isLoading, isError, error, refetch, isFetching } = useVehicles();
   const { data: dealers } = useDealers();
   const deleteVehicle = useDeleteVehicle();
-  const associateDealer = useAssociateDealer();
   const location = useLocation();
   const navigate = useNavigate();
   const searchQuery = useAppSearch();
@@ -37,7 +35,6 @@ export function VehiclesPage() {
     (location.state as { successMessage?: string } | null)?.successMessage ?? null,
   );
   const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | null>(null);
-  const [associateErrorMessage, setAssociateErrorMessage] = useState<string | null>(null);
   const [vehicleToDelete, setVehicleToDelete] = useState<Vehicle | null>(null);
 
   useEffect(() => {
@@ -63,20 +60,6 @@ export function VehiclesPage() {
       setVehicleToDelete(null);
       setDeleteErrorMessage(
         err instanceof Error ? err.message : 'Não foi possível excluir o veículo.',
-      );
-    }
-  }
-
-  async function handleDealerChange(vehicleId: number, value: string) {
-    setAssociateErrorMessage(null);
-    try {
-      await associateDealer.mutateAsync({
-        vehicleId,
-        dealerId: value === '' ? null : Number(value),
-      });
-    } catch (err) {
-      setAssociateErrorMessage(
-        err instanceof Error ? err.message : 'Não foi possível alterar a concessionária.',
       );
     }
   }
@@ -145,20 +128,6 @@ export function VehiclesPage() {
         </p>
       )}
 
-      {associateErrorMessage && (
-        <p className="vehicles-page__error" role="alert">
-          {associateErrorMessage}
-          <button
-            type="button"
-            className="vehicles-page__success-dismiss"
-            aria-label="Fechar aviso"
-            onClick={() => setAssociateErrorMessage(null)}
-          >
-            ×
-          </button>
-        </p>
-      )}
-
       {filteredVehicles?.length ? (
         <div className="vehicles-page__table-wrap">
           <table className="vehicles-page__table">
@@ -194,19 +163,9 @@ export function VehiclesPage() {
                     {vehicle.valor != null ? currencyFormatter.format(vehicle.valor) : '—'}
                   </td>
                   <td>
-                    <select
-                      className="vehicles-page__dealer-select"
-                      value={vehicle.dealerId ?? ''}
-                      disabled={associateDealer.isPending}
-                      onChange={(e) => handleDealerChange(vehicle.id, e.target.value)}
-                    >
-                      <option value="">Sem concessionária</option>
-                      {dealers?.map((dealer) => (
-                        <option key={dealer.id} value={dealer.id}>
-                          {dealer.razaoSocial}
-                        </option>
-                      ))}
-                    </select>
+                    {dealers?.find((dealer) => dealer.id === vehicle.dealerId)?.razaoSocial ?? (
+                      <span className="plate-chip plate-chip--empty">sem concessionária</span>
+                    )}
                   </td>
                   <td className="vehicles-page__row-actions">
                     <Link
